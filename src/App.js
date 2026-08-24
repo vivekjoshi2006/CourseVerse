@@ -7,7 +7,15 @@ import {
   Activity, ArrowDownAZ, ArrowLeftRight, ArrowRight, Banknote, BarChart3, Binary, BookOpen, Bookmark, Bot, Box, Boxes, Brain, Briefcase, Check, ChevronDown, Clock, Cloud, Code2, Coins, Combine, Compass, Component, Cpu, DollarSign, ExternalLink, Eye, Feather, FileCode, FileCode2, Flame, GitMerge, Globe, Globe2, GraduationCap, Heart, Languages, Layers, Layout, LayoutGrid, LineChart, LogOut, MessageCircle, MessageSquare, MessageSquareText, MessagesSquare, Monitor, Network, Palette, PenTool, PieChart, RefreshCw, Rocket, Scale, Scan, Search, Server, ShieldCheck, SlidersHorizontal, Smartphone, Sparkles, Star, Target, Terminal, Timer, TrendingUp, UserCheck, Workflow, X, Zap
 } from 'lucide-react';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+// API URL Resolver (Works on Localhost & Vercel)
+const isLocalhost = typeof window !== 'undefined' && (
+  window.location.hostname === 'localhost' || 
+  window.location.hostname === '127.0.0.1'
+);
+
+const API_BASE_URL = process.env.REACT_APP_API_URL !== undefined
+  ? process.env.REACT_APP_API_URL
+  : (isLocalhost ? 'http://localhost:5001' : '');
 
 // Authentication Provider & Context
 const AuthContext = createContext(null);
@@ -50,7 +58,9 @@ const GRADIENTS = {
   'Hacker Hub': 'linear-gradient(135deg, #ea580c, #fb923c)',
   'Open Library': 'linear-gradient(135deg, #047857, #10b981)',
   'DEV Com': 'linear-gradient(135deg, #be185d, #f43f5e)',
+  'DEV Community': 'linear-gradient(135deg, #be185d, #f43f5e)',
   'Apple': 'linear-gradient(135deg, #b45309, #f59e0b)',
+  'Stanford & Oxford': 'linear-gradient(135deg, #6b21a8, #9333ea)',
   'WikiBooks': 'linear-gradient(135deg, #0e7490, #06b6d4)',
 };
 
@@ -66,6 +76,7 @@ export const CATEGORIES = [
     icon: 'LayoutGrid',
     subcategories: [
       { name: 'All', icon: 'Compass' },
+      
       // Programming
       { name: 'Python', icon: 'Terminal' },
       { name: 'JavaScript & TypeScript', icon: 'FileCode2' },
@@ -74,28 +85,33 @@ export const CATEGORIES = [
       { name: 'Rust & Go', icon: 'Boxes' },
       { name: 'Algorithms & DS', icon: 'GitMerge' },
       { name: 'Full Stack', icon: 'Server' },
+
       // Tech & CS
       { name: 'Web Development', icon: 'Globe' },
       { name: 'Mobile Dev', icon: 'Smartphone' },
       { name: 'DevOps & Cloud', icon: 'Cloud' },
       { name: 'Cybersecurity', icon: 'ShieldCheck' },
       { name: 'System Design', icon: 'Network' },
+
       // AI & Data
       { name: 'Machine Learning', icon: 'Brain' },
       { name: 'Data Science', icon: 'BarChart3' },
       { name: 'LLMs & GenAI', icon: 'Sparkles' },
       { name: 'Deep Learning', icon: 'Activity' },
       { name: 'Computer Vision', icon: 'Scan' },
+
       // Design & Creative
       { name: 'UI/UX Design', icon: 'Layout' },
       { name: '3D Animation', icon: 'Box' },
       { name: 'Graphic Design', icon: 'PenTool' },
       { name: 'Figma & Design Systems', icon: 'Component' },
+
       // Business & SaaS
       { name: 'Digital Marketing', icon: 'TrendingUp' },
       { name: 'Product Management', icon: 'Target' },
       { name: 'Startup Growth', icon: 'Rocket' },
       { name: 'Fintech & Sales', icon: 'Banknote' },
+
       // Languages
       { name: 'English', icon: 'MessageSquareText' },
       { name: 'Spanish', icon: 'MessageSquare' },
@@ -190,39 +206,59 @@ export const CATEGORIES = [
 export const classifyText = (title = '', desc = '', tags = '') => {
   const text = `${title} ${desc} ${tags}`.toLowerCase();
 
-  if (text.includes('spanish') || text.includes('french') || text.includes('german') || text.includes('japanese') || text.includes('english') || text.includes('language')) {
-    let sub = 'English';
-    if (text.includes('spanish')) sub = 'Spanish';
-    if (text.includes('french')) sub = 'French';
-    if (text.includes('german')) sub = 'German';
-    if (text.includes('japanese')) sub = 'Japanese';
-    return { category: 'languages', subcategory: sub };
-  }
-  if (text.includes('python') || text.includes('javascript') || text.includes('typescript') || text.includes('c++') || text.includes('rust') || text.includes('golang') || text.includes('java') || text.includes('algorithm')) {
+  // Languages
+  if (text.includes('spanish') || text.includes('espanol')) return { category: 'languages', subcategory: 'Spanish' };
+  if (text.includes('french') || text.includes('francais')) return { category: 'languages', subcategory: 'French' };
+  if (text.includes('german') || text.includes('deutsch')) return { category: 'languages', subcategory: 'German' };
+  if (text.includes('japanese') || text.includes('nihongo') || text.includes('jlpt')) return { category: 'languages', subcategory: 'Japanese' };
+  if (text.includes('mandarin') || text.includes('chinese') || text.includes('hsk')) return { category: 'languages', subcategory: 'Mandarin' };
+  if (text.includes('english') || text.includes('grammar') || text.includes('communication') || text.includes('language')) return { category: 'languages', subcategory: 'English' };
+
+  // Programming
+  if (
+    text.includes('python') || text.includes('javascript') || text.includes('typescript') ||
+    text.includes('c++') || text.includes('c#') || text.includes('rust') || text.includes('golang') ||
+    text.includes('java') || text.includes('algorithm') || text.includes('full stack') || text.includes('fullstack')
+  ) {
     let sub = 'Python';
-    if (text.includes('javascript') || text.includes('typescript') || text.includes('react')) sub = 'JavaScript & TypeScript';
-    if (text.includes('c++') || text.includes('c#')) sub = 'C / C++';
-    if (text.includes('rust') || text.includes('go')) sub = 'Rust & Go';
-    if (text.includes('java')) sub = 'Java & Spring';
-    if (text.includes('algorithm') || text.includes('data structure')) sub = 'Algorithms & DS';
+    if (text.includes('javascript') || text.includes('typescript') || text.includes('react') || text.includes('node')) sub = 'JavaScript & TypeScript';
+    if (text.includes('c++') || text.includes('c#') || text.includes('c /')) sub = 'C / C++';
+    if (text.includes('rust') || text.includes('go') || text.includes('golang')) sub = 'Rust & Go';
+    if (text.includes('java') || text.includes('spring')) sub = 'Java & Spring';
+    if (text.includes('algorithm') || text.includes('data structure') || text.includes('leetcode')) sub = 'Algorithms & DS';
+    if (text.includes('full stack') || text.includes('fullstack') || text.includes('mern')) sub = 'Full Stack';
     return { category: 'programming', subcategory: sub };
   }
-  if (text.includes('data') || text.includes('machine learning') || text.includes('ai') || text.includes('gpt') || text.includes('llm')) {
-    let sub = 'Machine Learning';
-    if (text.includes('data science') || text.includes('analytics')) sub = 'Data Science';
-    if (text.includes('prompt') || text.includes('llm') || text.includes('genai')) sub = 'LLMs & GenAI';
-    return { category: 'ai', subcategory: sub };
-  }
-  if (text.includes('design') || text.includes('ui') || text.includes('ux') || text.includes('css') || text.includes('graphic') || text.includes('figma')) {
-    return { category: 'design', subcategory: 'UI/UX Design' };
-  }
-  if (text.includes('business') || text.includes('marketing') || text.includes('management') || text.includes('startup') || text.includes('saas') || text.includes('growth') || text.includes('product')) {
-    return { category: 'business', subcategory: 'Product Management' };
-  }
+
+  // AI & Data
+  if (text.includes('prompt') || text.includes('llm') || text.includes('gpt') || text.includes('genai') || text.includes('generative ai') || text.includes('langchain')) return { category: 'ai', subcategory: 'LLMs & GenAI' };
+  if (text.includes('computer vision') || text.includes('opencv') || text.includes('yolo')) return { category: 'ai', subcategory: 'Computer Vision' };
+  if (text.includes('deep learning') || text.includes('neural') || text.includes('pytorch')) return { category: 'ai', subcategory: 'Deep Learning' };
+  if (text.includes('data science') || text.includes('analytics') || text.includes('sql') || text.includes('pandas')) return { category: 'ai', subcategory: 'Data Science' };
+  if (text.includes('data') || text.includes('machine learning') || text.includes('ai')) return { category: 'ai', subcategory: 'Machine Learning' };
+
+  // Design & Creative
+  if (text.includes('3d') || text.includes('blender') || text.includes('animation') || text.includes('threejs')) return { category: 'design', subcategory: '3D Animation' };
+  if (text.includes('figma') || text.includes('design system')) return { category: 'design', subcategory: 'Figma & Design Systems' };
+  if (text.includes('graphic') || text.includes('photoshop') || text.includes('typography') || text.includes('illustrator')) return { category: 'design', subcategory: 'Graphic Design' };
+  if (text.includes('ui') || text.includes('ux') || text.includes('user experience') || text.includes('wireframe')) return { category: 'design', subcategory: 'UI/UX Design' };
+
+  // Business & SaaS
+  if (text.includes('startup') || text.includes('entrepreneurship') || text.includes('saas') || text.includes('growth')) return { category: 'business', subcategory: 'Startup Growth' };
+  if (text.includes('marketing') || text.includes('seo') || text.includes('social media') || text.includes('acquisition')) return { category: 'business', subcategory: 'Digital Marketing' };
+  if (text.includes('product management') || text.includes('scrum') || text.includes('agile') || text.includes('roadmap')) return { category: 'business', subcategory: 'Product Management' };
+  if (text.includes('fintech') || text.includes('sales') || text.includes('finance') || text.includes('trading')) return { category: 'business', subcategory: 'Fintech & Sales' };
+
+  // Tech & CS
+  if (text.includes('devops') || text.includes('docker') || text.includes('kubernetes') || text.includes('cloud') || text.includes('aws')) return { category: 'tech', subcategory: 'DevOps & Cloud' };
+  if (text.includes('mobile') || text.includes('android') || text.includes('ios') || text.includes('swift') || text.includes('flutter')) return { category: 'tech', subcategory: 'Mobile Dev' };
+  if (text.includes('security') || text.includes('cyber') || text.includes('hacking') || text.includes('cryptography')) return { category: 'tech', subcategory: 'Cybersecurity' };
+  if (text.includes('system design') || text.includes('architecture') || text.includes('distributed')) return { category: 'tech', subcategory: 'System Design' };
+
   return { category: 'tech', subcategory: 'Web Development' };
 };
 
-// Course Duration
+// Course Duration Matcher
 const matchesDurationFilter = (durationStr = '', filterValue) => {
   if (filterValue === 'all') return true;
   const str = (durationStr || '').toLowerCase();
@@ -243,29 +279,21 @@ const matchesDurationFilter = (durationStr = '', filterValue) => {
   const isWeek = str.includes('week');
   const isHour = str.includes('hour') || str.includes('hr');
 
-  // Convert roughly to weeks equivalent
   let approxWeeks = 0;
   if (isMonth) approxWeeks = num * 4.3;
   else if (isWeek) approxWeeks = num;
   else if (isHour) approxWeeks = num / 10;
   else approxWeeks = 4;
 
-  // < 2 Weeks (Crash Courses)
   if (filterValue === 'under2Weeks') {
     return (isWeek && num <= 2) || (isHour && num <= 20) || (approxWeeks <= 2 && !isMonth && !str.includes('textbook'));
   }
-
-  // 2–4 Weeks (Standard Modules)
   if (filterValue === '2to4Weeks') {
     return (isWeek && num > 2 && num <= 4) || (isHour && num > 20 && num <= 50) || (approxWeeks > 2 && approxWeeks <= 4.5);
   }
-
-  // 1–3 Months (Deep Dives)
   if (filterValue === '1to3Months') {
     return (isMonth && num >= 1 && num <= 3) || (isWeek && num > 4 && num <= 12) || (isHour && num > 50 && num <= 150) || (approxWeeks > 4.5 && approxWeeks <= 12);
   }
-
-  // 3+ Months (Specializations & Professional Certificates)
   if (filterValue === '3PlusMonths') {
     return (isMonth && num > 3) || (isWeek && num > 12) || (isHour && num > 150) || approxWeeks > 12;
   }
@@ -275,7 +303,7 @@ const matchesDurationFilter = (durationStr = '', filterValue) => {
 
 // Parse enrollment count for popularity sorting
 const parseEnrollment = (enrolledStr = '') => {
-  const str = enrolledStr.toString().toLowerCase();
+  const str = (enrolledStr || '').toString().toLowerCase();
   if (str.includes('m')) return (parseFloat(str) || 1) * 1000000;
   if (str.includes('k')) return (parseFloat(str) || 1) * 1000;
   const num = parseFloat(str.replace(/[^0-9.]/g, ''));
@@ -347,69 +375,113 @@ const AppContent = () => {
     } catch (backendErr) {
       console.warn('Backend unavailable, running multi-platform direct API stream in browser...');
       try {
-        const [fccRes, hnRes, olRes, devRes] = await Promise.allSettled([
-          fetch('https://www.freecodecamp.org/curriculum-data/v1/available-superblocks.json'),
-          fetch('https://hn.algolia.com/api/v1/search?query=course+tutorial+mit+stanford+harvard&tags=story&hitsPerPage=15'),
-          fetch('https://openlibrary.org/subjects/computer_science.json?limit=12'),
-          fetch('https://dev.to/api/articles?tag=course&per_page=12'),
+        const [olRes, devRes, wikiRes, hnRes] = await Promise.allSettled([
+          fetch('https://openlibrary.org/subjects/computer_science.json?limit=15'),
+          fetch('https://dev.to/api/articles?tag=course&per_page=15'),
+          fetch('https://en.wikibooks.org/w/api.php?action=query&list=categorymembers&cmtitle=Category:Subject:Computer_science&format=json&cmlimit=12&origin=*'),
+          fetch('https://hn.algolia.com/api/v1/search?query=course+tutorial+mit+stanford+cs&tags=story&hitsPerPage=12')
         ]);
 
-        const fccStream = [];
-        const hnStream = [];
+        const fccStream = [
+          {
+            id: 'fcc-responsive-web',
+            title: 'Responsive Web Design Certification',
+            description: 'Learn modern HTML5, CSS Flexbox, CSS Grid, and responsive web design best practices.',
+            category: 'tech',
+            subcategory: 'Web Development',
+            provider: 'CodeCamp',
+            isFree: true,
+            rating: '4.9',
+            enrolled: '450k+',
+            level: 'Beginner',
+            duration: '300 Hours',
+            url: 'https://www.freecodecamp.org/learn/2022/responsive-web-design/',
+            gradient: GRADIENTS['CodeCamp'],
+            tag: '100% Free Verified',
+            hasCertificate: true,
+            highlights: ['HTML5 & Modern CSS', '5 Mandatory web projects', 'Official FreeCodeCamp certificate'],
+          },
+          {
+            id: 'fcc-scientific-python',
+            title: 'Scientific Computing with Python Certification',
+            description: 'Master core Python, algorithms, data structures, and computational problem solving.',
+            category: 'programming',
+            subcategory: 'Python',
+            provider: 'CodeCamp',
+            isFree: true,
+            rating: '4.9',
+            enrolled: '380k+',
+            level: 'Beginner',
+            duration: '300 Hours',
+            url: 'https://www.freecodecamp.org/learn/scientific-computing-with-python/',
+            gradient: GRADIENTS['CodeCamp'],
+            tag: 'Certification',
+            hasCertificate: true,
+            highlights: ['Object-oriented Python', 'Data structures & algorithms', 'Official digital certification'],
+          },
+          {
+            id: 'fcc-js-algo',
+            title: 'JavaScript Algorithms and Data Structures',
+            description: 'Learn JavaScript fundamentals, ES6 syntax, OOP, functional programming, and algorithm scripting.',
+            category: 'programming',
+            subcategory: 'JavaScript & TypeScript',
+            provider: 'CodeCamp',
+            isFree: true,
+            rating: '4.9',
+            enrolled: '420k+',
+            level: 'Intermediate',
+            duration: '300 Hours',
+            url: 'https://www.freecodecamp.org/learn/javascript-algorithms-and-data-structures/',
+            gradient: GRADIENTS['CodeCamp'],
+            tag: 'Core Track',
+            hasCertificate: true,
+            highlights: ['ES6+ Modern syntax', 'Data structures in JS', 'Verified developer certificate'],
+          }
+        ];
+
+        const courseraStream = [
+          {
+            id: 'coursera-ml-spec',
+            title: 'Machine Learning Specialization (DeepLearning.AI)',
+            description: 'Master foundational AI concepts and develop practical machine learning skills with Andrew Ng.',
+            category: 'ai',
+            subcategory: 'Machine Learning',
+            provider: 'Coursera',
+            isFree: false,
+            rating: '4.9',
+            enrolled: '880k+',
+            level: 'Beginner',
+            duration: '3 Months',
+            url: 'https://www.coursera.org/specializations/machine-learning-introduction',
+            gradient: GRADIENTS['Coursera'],
+            tag: 'Specialization',
+            hasCertificate: true,
+            highlights: ['Supervised & Unsupervised Learning', 'Neural networks & decision trees', 'Industry-recognized certificate'],
+          },
+          {
+            id: 'apple-swift-dev',
+            title: 'Develop in Swift Tutorials & iOS Architecture',
+            description: 'Official comprehensive curriculum by Apple Education for building iOS & macOS apps with SwiftUI.',
+            category: 'tech',
+            subcategory: 'Mobile Dev',
+            provider: 'Apple',
+            isFree: true,
+            rating: '4.9',
+            enrolled: '320k+',
+            level: 'Intermediate',
+            duration: '2 Months',
+            url: 'https://developer.apple.com/tutorials/swiftui',
+            gradient: GRADIENTS['Apple'],
+            tag: 'Official Apple Track',
+            hasCertificate: false,
+            highlights: ['SwiftUI state & data flow', 'CoreData & SwiftData', 'App Store ready architecture'],
+          }
+        ];
+
         const olStream = [];
         const devStream = [];
-
-        if (fccRes.status === 'fulfilled' && fccRes.value.ok) {
-          const fccData = await fccRes.value.json();
-          (fccData.superblocks || []).filter((s) => !s.includes('-v9') && !s.includes('-22')).forEach((slug, idx) => {
-            const title = slug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()) + ' Certification';
-            const { category, subcategory } = classifyText(title, '', slug);
-            fccStream.push({
-              id: `fcc-${slug}`,
-              title,
-              description: `Master ${title} through interactive in-browser coding exercises and portfolio projects.`,
-              category,
-              subcategory,
-              provider: 'CodeCamp',
-              isFree: true,
-              rating: '4.9',
-              enrolled: `${90 + idx * 5}k+`,
-              level: idx % 3 === 0 ? 'Advanced' : 'Beginner',
-              duration: '300 Hours',
-              url: `https://www.freecodecamp.org/learn/${slug}`,
-              gradient: GRADIENTS['CodeCamp'],
-              tag: '100% Free Verified',
-              hasCertificate: true,
-              highlights: ['Interactive browser code editor', '5 mandatory portfolio projects', 'Official certificate included'],
-            });
-          });
-        }
-
-        if (hnRes.status === 'fulfilled' && hnRes.value.ok) {
-          const hnData = await hnRes.value.json();
-          (hnData.hits || []).forEach((hit) => {
-            if (!hit.title || !hit.url) return;
-            const { category, subcategory } = classifyText(hit.title, '');
-            hnStream.push({
-              id: `hn-${hit.objectID}`,
-              title: hit.title,
-              description: `Curated technical learning track submitted by @${hit.author || 'engineer'} on Hacker Hub.`,
-              category,
-              subcategory,
-              provider: 'Hacker Hub',
-              isFree: true,
-              rating: '4.9',
-              enrolled: `${hit.points || 150} pts`,
-              level: 'Intermediate',
-              duration: 'Self-Paced Track',
-              url: hit.url,
-              gradient: GRADIENTS['Hacker Hub'],
-              tag: 'Vetted Track',
-              hasCertificate: false,
-              highlights: ['Direct link to lecture repos & slides', 'Vetted by professional software engineers', 'Zero paywalls'],
-            });
-          });
-        }
+        const wikiStream = [];
+        const hnStream = [];
 
         if (olRes.status === 'fulfilled' && olRes.value.ok) {
           const olData = await olRes.value.json();
@@ -462,13 +534,69 @@ const AppContent = () => {
           });
         }
 
+        if (wikiRes.status === 'fulfilled' && wikiRes.value.ok) {
+          const wikiData = await wikiRes.value.json();
+          (wikiData?.query?.categorymembers || []).forEach((page, idx) => {
+            const { category, subcategory } = classifyText(page.title, 'textbook curriculum');
+            wikiStream.push({
+              id: `wiki-${page.pageid || idx}`,
+              title: page.title,
+              description: `Open-source textbook and complete syllabus track hosted on WikiBooks.`,
+              category,
+              subcategory,
+              provider: 'WikiBooks',
+              isFree: true,
+              rating: '4.7',
+              enrolled: '50k+ readers',
+              level: 'Beginner',
+              duration: 'Self-Paced Track',
+              url: `https://en.wikibooks.org/wiki/${encodeURIComponent(page.title)}`,
+              gradient: GRADIENTS['WikiBooks'],
+              tag: 'Open Curriculum',
+              hasCertificate: false,
+              highlights: ['Comprehensive syllabus', 'Community maintained', '100% Free access'],
+            });
+          });
+        }
+
+        if (hnRes.status === 'fulfilled' && hnRes.value.ok) {
+          const hnData = await hnRes.value.json();
+          (hnData.hits || []).forEach((hit) => {
+            if (!hit.title) return;
+            const liveUrl = hit.url && hit.url.startsWith('http')
+              ? hit.url
+              : `https://news.ycombinator.com/item?id=${hit.objectID}`;
+            const { category, subcategory } = classifyText(hit.title, '');
+            hnStream.push({
+              id: `hn-${hit.objectID}`,
+              title: hit.title,
+              description: `Curated technical learning track submitted by @${hit.author || 'engineer'} on Hacker Hub.`,
+              category,
+              subcategory,
+              provider: 'Hacker Hub',
+              isFree: true,
+              rating: '4.9',
+              enrolled: `${hit.points || 150} pts`,
+              level: 'Intermediate',
+              duration: 'Self-Paced Track',
+              url: liveUrl,
+              gradient: GRADIENTS['Hacker Hub'],
+              tag: 'Vetted Track',
+              hasCertificate: false,
+              highlights: ['Direct link to lecture repos & slides', 'Vetted by professional software engineers', 'Zero paywalls'],
+            });
+          });
+        }
+
         const combined = [];
-        const maxLen = Math.max(fccStream.length, hnStream.length, olStream.length, devStream.length);
+        const maxLen = Math.max(fccStream.length, courseraStream.length, olStream.length, devStream.length, wikiStream.length, hnStream.length);
         for (let i = 0; i < maxLen; i++) {
           if (fccStream[i]) combined.push(fccStream[i]);
-          if (hnStream[i]) combined.push(hnStream[i]);
+          if (courseraStream[i]) combined.push(courseraStream[i]);
           if (olStream[i]) combined.push(olStream[i]);
           if (devStream[i]) combined.push(devStream[i]);
+          if (wikiStream[i]) combined.push(wikiStream[i]);
+          if (hnStream[i]) combined.push(hnStream[i]);
         }
 
         if (combined.length > 0) {
@@ -479,7 +607,7 @@ const AppContent = () => {
         }
       } catch (err) {
         setCourses([]);
-        setApiError('Unable to connect to course. Please verify your internet connection.');
+        setApiError('Unable to connect to course feeds. Please verify your connection.');
       }
     } finally {
       setIsSyncing(false);
@@ -525,7 +653,7 @@ const AppContent = () => {
         if (levelFilter === 'advanced' && !lvl.includes('advanced') && !lvl.includes('expert') && !lvl.includes('all')) return false;
       }
 
-      // Separate Duration Filter
+      // Duration Filter
       if (!matchesDurationFilter(course.duration, durationFilter)) {
         return false;
       }
@@ -593,7 +721,7 @@ const AppContent = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
-      {/* Navbar - Clean Light Mode */}
+      {/* Navbar */}
       <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-rose-100 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
 
@@ -617,7 +745,7 @@ const AppContent = () => {
           {/* Header Action Buttons */}
           <div className="flex items-center gap-2.5 sm:gap-3">
 
-            {/* Saved Button (Pink Theme) */}
+            {/* Saved Button */}
             <button
               type="button"
               onClick={() => setShowSavedOnly(!showSavedOnly)}
@@ -686,23 +814,18 @@ const AppContent = () => {
 
       {/* Hero Section */}
       <section className="bg-white border-b border-indigo-100 py-14 md:py-18 relative overflow-hidden">
-
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-violet-100/60 via-indigo-50/30 to-transparent pointer-events-none" />
 
         <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
-
-          {/* Top Badge - Increased Size */}
           <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-gradient-to-r from-violet-50 to-indigo-50 border border-violet-200/80 text-violet-900 text-sm sm:text-base font-bold mb-6 shadow-sm shadow-violet-100">
             <Sparkles size={18} className="text-violet-600 animate-pulse" />
             <span>Multi-Platform Public Course Directory</span>
           </div>
 
-          {/* Main Heading */}
           <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight mb-4 text-center bg-gradient-to-r from-violet-600 via-indigo-600 to-pink-500 bg-clip-text text-transparent pb-3 pt-1 leading-[1.3] sm:leading-[1.3]">
             Discover Verified Courses Across Every Tech Track
           </h1>
 
-          {/* Subtitle */}
           <p className="text-base sm:text-lg text-violet-900/80 max-w-2xl mx-auto mb-8 font-semibold leading-relaxed">
             Real-time curriculum indexing across CodeCamp, Coursera, Hacker Hub University Archives, Open Library, Apple OCW, WikiBooks, and DEV Community.
           </p>
@@ -749,9 +872,7 @@ const AppContent = () => {
 
       {/* Controls & Filter Bar */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
-
         <div className="bg-indigo-50/70 backdrop-blur-md p-5 md:p-6 rounded-2xl border border-indigo-100 shadow-lg shadow-indigo-900/5 mb-8 space-y-5">
-
           <div className="flex items-center gap-2.5 overflow-x-auto pb-1 scrollbar-none [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {CATEGORIES.map((cat) => {
               const isActive = selectedCat === cat.id;
@@ -783,8 +904,6 @@ const AppContent = () => {
           {activeCategoryObj?.subcategories && activeCategoryObj.subcategories.length > 0 && (
             <div className="pt-4 border-t border-indigo-200/60">
               <div className="text-[15px] flex items-center gap-3 bg-purple-100/60 p-3 rounded-xl border border-purple-200/50">
-
-                {/* Tracks */}
                 <div className="inline-flex flex-col items-center gap-1.5 bg-violet-900/10 border border-violet-300/60 px-3 py-1 rounded-lg shrink-0">
                   <Layers className="w-4 h-4 text-violet-700" />
                   <span className="text-[15px] font-black tracking-widest text-violet-900 uppercase">
@@ -804,7 +923,6 @@ const AppContent = () => {
                     })
                     .map((subItem) => {
                       const subName = typeof subItem === 'string' ? subItem : subItem.name;
-
                       const isProgramming = activeCategoryObj.name === 'Programming' || activeCategoryObj.id === 'programming';
                       const subIconKey = typeof subItem === 'object' && subItem.icon ? subItem.icon : null;
                       const SubIconComponent = isProgramming && subName !== 'All'
@@ -838,13 +956,10 @@ const AppContent = () => {
         <div className="relative mb-8 w-full z-30">
           <div className="absolute -inset-1.5 bg-gradient-to-r from-sky-200/50 via-purple-200/40 to-pink-200/50 rounded-[2.5rem] blur-2xl opacity-80 pointer-events-none -z-10" />
 
-          {/* Equal Height Grid Container */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch w-full">
-
-            {/* Left: Domain Title, Badge & 5 Dropdowns */}
+            {/* Left: Controls & 5 Dropdowns */}
             <div className="lg:col-span-8 xl:col-span-9 relative bg-white/95 backdrop-blur-2xl p-4 sm:p-5 rounded-3xl border border-indigo-100/80 shadow-[0_12px_40px_rgba(79,70,229,0.06)] flex flex-col justify-between gap-5 h-full transition-all">
 
-              {/* Icon Title And Live Counter Badge */}
               <div className="flex items-center gap-3.5">
                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 via-violet-600 to-purple-500 flex items-center justify-center text-white shrink-0 shadow-md shadow-indigo-500/20">
                   {showSavedOnly ? <Bookmark size={22} className="fill-white/20" /> : <SlidersHorizontal size={22} />}
@@ -861,327 +976,312 @@ const AppContent = () => {
                 </div>
               </div>
 
-              {/* 5 Dropdowns Container */}
-              <div className="flex flex-col gap-4 flex-1 justify-center">
+              {/* Dropdowns Grid */}
+              <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2.5 sm:gap-3 flex-1 justify-center">
 
-                {/* Top Row: 3 Dropdowns */}
-                <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
-
-                  {/* Platform Dropdown */}
-                  <div className="relative flex-1 min-w-[140px]" data-dropdown>
-                    <button
-                      type="button"
-                      onClick={() => setOpenDropdown(openDropdown === 'platform' ? null : 'platform')}
-                      className={`w-full flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-2xl border transition-all duration-200 ${openDropdown === 'platform' || platformFilter !== 'all'
-                        ? 'bg-sky-100/90 border-sky-300 text-sky-950 shadow-md shadow-sky-500/10'
-                        : 'bg-sky-50/70 hover:bg-sky-100/60 border-sky-200/70 text-sky-900'
-                        }`}
-                    >
-                      <div className="flex items-center gap-2 truncate">
-                        <div className="w-6 h-6 rounded-lg bg-sky-200/80 flex items-center justify-center text-sky-700 shrink-0">
-                          <Globe2 size={14} />
-                        </div>
-                        <div className="text-left truncate">
-                          <p className="text-[13px] font-bold uppercase text-sky-600">Platform</p>
-                          <p className="text-[13px] font-extrabold capitalize truncate">
-                            {platformFilter === 'all' ? 'All Sources' : platformFilter}
-                          </p>
-                        </div>
+                {/* Platform Dropdown */}
+                <div className="relative col-span-1 sm:flex-1 min-w-0" data-dropdown>
+                  <button
+                    type="button"
+                    onClick={() => setOpenDropdown(openDropdown === 'platform' ? null : 'platform')}
+                    className={`w-full flex items-center justify-between gap-1.5 px-3 py-2.5 sm:px-3.5 sm:py-2.5 rounded-2xl border transition-all duration-200 ${openDropdown === 'platform' || platformFilter !== 'all'
+                      ? 'bg-sky-100/90 border-sky-300 text-sky-950 shadow-md shadow-sky-500/10'
+                      : 'bg-sky-50/70 hover:bg-sky-100/60 border-sky-200/70 text-sky-900'
+                      }`}
+                  >
+                    <div className="flex items-center gap-1.5 min-w-0 truncate">
+                      <div className="w-6 h-6 rounded-lg bg-sky-200/80 flex items-center justify-center text-sky-700 shrink-0">
+                        <Globe2 size={14} />
                       </div>
-                      <ChevronDown
-                        size={14}
-                        className={`text-sky-600 shrink-0 transition-transform duration-200 ${openDropdown === 'platform' ? 'rotate-180' : ''}`}
-                      />
-                    </button>
+                      <div className="text-left min-w-0 truncate">
+                        <p className="text-[11px] sm:text-[13px] font-bold uppercase text-sky-600">Platform</p>
+                        <p className="text-[12px] sm:text-[13px] font-extrabold capitalize truncate">
+                          {platformFilter === 'all' ? 'All Sources' : platformFilter}
+                        </p>
+                      </div>
+                    </div>
+                    <ChevronDown
+                      size={14}
+                      className={`text-sky-600 shrink-0 transition-transform duration-200 ${openDropdown === 'platform' ? 'rotate-180' : ''}`}
+                    />
+                  </button>
 
-                    {/* Platform Popover Menu */}
-                    {openDropdown === 'platform' && (
-                      <div className="absolute left-0 top-full mt-2 w-56 bg-white/95 backdrop-blur-2xl p-2 rounded-2xl border border-sky-100 shadow-2xl shadow-sky-500/15 z-50 animate-in fade-in zoom-in-95 duration-150">
-                        <div className="px-2 py-1.5 text-[13px] font-bold text-sky-600 uppercase tracking-wider">Select Source</div>
+                  {openDropdown === 'platform' && (
+                    <div className="absolute left-0 top-full mt-2 w-56 max-w-[85vw] bg-white backdrop-blur-2xl p-2 rounded-2xl border border-sky-100 shadow-2xl shadow-sky-500/20 z-50 animate-in fade-in zoom-in-95 duration-150">
+                      <div className="px-2 py-1.5 text-[13px] font-bold text-sky-600 uppercase tracking-wider">Select Source</div>
+                      <button
+                        type="button"
+                        onClick={() => { setPlatformFilter('all'); setOpenDropdown(null); }}
+                        className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-[13px] font-bold transition-all ${platformFilter === 'all'
+                          ? 'bg-sky-500 text-white shadow-sm shadow-sky-500/30'
+                          : 'text-sky-950 hover:bg-sky-50'
+                          }`}
+                      >
+                        <span>All Sources</span>
+                        <span className={`text-[13px] px-1.5 py-0.5 rounded-full ${platformFilter === 'all' ? 'bg-white/20 text-white' : 'bg-sky-100 text-sky-700'}`}>
+                          {platformCounts.all || 0}
+                        </span>
+                      </button>
+                      {availablePlatforms.filter(p => p !== 'all').map(prov => (
                         <button
+                          key={prov}
                           type="button"
-                          onClick={() => { setPlatformFilter('all'); setOpenDropdown(null); }}
-                          className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-[13px] font-bold transition-all ${platformFilter === 'all'
+                          onClick={() => { setPlatformFilter(prov); setOpenDropdown(null); }}
+                          className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-[13px] font-bold transition-all mt-1 ${platformFilter === prov
                             ? 'bg-sky-500 text-white shadow-sm shadow-sky-500/30'
                             : 'text-sky-950 hover:bg-sky-50'
                             }`}
                         >
-                          <span>All Sources</span>
-                          <span className={`text-[13px] px-1.5 py-0.5 rounded-full ${platformFilter === 'all' ? 'bg-white/20 text-white' : 'bg-sky-100 text-sky-700'}`}>
-                            {platformCounts.all || 0}
+                          <span className="capitalize">{prov}</span>
+                          <span className={`text-[13px] px-1.5 py-0.5 rounded-full ${platformFilter === prov ? 'bg-white/20 text-white' : 'bg-sky-100 text-sky-700'}`}>
+                            {platformCounts[prov] || 0}
                           </span>
                         </button>
-                        {availablePlatforms.filter(p => p !== 'all').map(prov => (
-                          <button
-                            key={prov}
-                            type="button"
-                            onClick={() => { setPlatformFilter(prov); setOpenDropdown(null); }}
-                            className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-[13px] font-bold transition-all mt-1 ${platformFilter === prov
-                              ? 'bg-sky-500 text-white shadow-sm shadow-sky-500/30'
-                              : 'text-sky-950 hover:bg-sky-50'
-                              }`}
-                          >
-                            <span className="capitalize">{prov}</span>
-                            <span className={`text-[13px] px-1.5 py-0.5 rounded-full ${platformFilter === prov ? 'bg-white/20 text-white' : 'bg-sky-100 text-sky-700'}`}>
-                              {platformCounts[prov] || 0}
-                            </span>
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Level Dropdown */}
-                  <div className="relative flex-1 min-w-[140px]" data-dropdown>
-                    <button
-                      type="button"
-                      onClick={() => setOpenDropdown(openDropdown === 'level' ? null : 'level')}
-                      className={`w-full flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-2xl border transition-all duration-200 ${openDropdown === 'level' || levelFilter !== 'all'
-                        ? 'bg-purple-100/90 border-purple-300 text-purple-950 shadow-md shadow-purple-500/10'
-                        : 'bg-purple-50/70 hover:bg-purple-100/60 border-purple-200/70 text-purple-900'
-                        }`}
-                    >
-                      <div className="flex items-center gap-2 truncate">
-                        <div className="w-6 h-6 rounded-lg bg-purple-200/80 flex items-center justify-center text-purple-700 shrink-0">
-                          <BarChart3 size={14} />
-                        </div>
-                        <div className="text-left truncate">
-                          <p className="text-[13px] font-bold uppercase tracking-wider text-purple-600">Level</p>
-                          <p className="text-[13px] font-extrabold truncate">
-                            {levelFilter === 'all' ? 'All Levels' : levelFilter === 'beginner' ? 'Beginner Friendly' : levelFilter === 'intermediate' ? 'Intermediate' : 'Mastery / Advanced'}
-                          </p>
-                        </div>
-                      </div>
-                      <ChevronDown
-                        size={14}
-                        className={`text-purple-600 shrink-0 transition-transform duration-200 ${openDropdown === 'level' ? 'rotate-180' : ''}`}
-                      />
-                    </button>
-
-                    {/* Level Popover Menu */}
-                    {openDropdown === 'level' && (
-                      <div className="absolute left-0 top-full mt-2 w-56 bg-white/95 backdrop-blur-2xl p-2 rounded-2xl border border-purple-100 shadow-2xl shadow-purple-500/15 z-50 animate-in fade-in zoom-in-95 duration-150">
-                        <div className="px-2 py-1.5 text-[13px] font-bold text-purple-600 uppercase tracking-wider">Difficulty Level</div>
-                        {[
-                          { value: 'all', label: 'All Levels', icon: GraduationCap },
-                          { value: 'beginner', label: 'Beginner Friendly', icon: BookOpen },
-                          { value: 'intermediate', label: 'Intermediate', icon: Zap },
-                          { value: 'advanced', label: 'Mastery / Advanced', icon: Sparkles }
-                        ].map(opt => {
-                          const Icon = opt.icon;
-                          const isSelected = levelFilter === opt.value;
-                          return (
-                            <button
-                              key={opt.value}
-                              type="button"
-                              onClick={() => { setLevelFilter(opt.value); setOpenDropdown(null); }}
-                              className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-[13px] font-bold transition-all mt-1 ${isSelected
-                                ? 'bg-purple-600 text-white shadow-sm shadow-purple-500/30'
-                                : 'text-purple-950 hover:bg-purple-50'
-                                }`}
-                            >
-                              <div className="flex items-center gap-2">
-                                <Icon size={14} className={isSelected ? 'text-white' : 'text-purple-500'} />
-                                <span>{opt.label}</span>
-                              </div>
-                              {isSelected && <Check size={14} className="stroke-[3]" />}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Duration Dropdown */}
-                  <div className="relative flex-1 min-w-[140px]" data-dropdown>
-                    <button
-                      type="button"
-                      onClick={() => setOpenDropdown(openDropdown === 'duration' ? null : 'duration')}
-                      className={`w-full flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-2xl border transition-all duration-200 ${openDropdown === 'duration' || durationFilter !== 'all'
-                        ? 'bg-emerald-100/90 border-emerald-300 text-emerald-950 shadow-md shadow-emerald-500/10'
-                        : 'bg-emerald-50/70 hover:bg-emerald-100/60 border-emerald-200/70 text-emerald-900'
-                        }`}
-                    >
-                      <div className="flex items-center gap-2 truncate">
-                        <div className="w-6 h-6 rounded-lg bg-emerald-200/80 flex items-center justify-center text-emerald-700 shrink-0">
-                          <Timer size={14} />
-                        </div>
-                        <div className="text-left truncate">
-                          <p className="text-[13px] font-bold uppercase tracking-wider text-emerald-600">Duration</p>
-                          <p className="text-[13px] font-extrabold truncate">
-                            {durationFilter === 'all' ? 'All Durations' : durationFilter === 'under2Weeks' ? '< 2 Weeks' : durationFilter === '2to4Weeks' ? '2–4 Weeks' : durationFilter === '1to3Months' ? '1–3 Months' : durationFilter === '3PlusMonths' ? '3+ Months' : 'Self-Paced'}
-                          </p>
-                        </div>
-                      </div>
-                      <ChevronDown
-                        size={14}
-                        className={`text-emerald-600 shrink-0 transition-transform duration-200 ${openDropdown === 'duration' ? 'rotate-180' : ''}`}
-                      />
-                    </button>
-
-                    {/* Duration Popover Menu */}
-                    {openDropdown === 'duration' && (
-                      <div className="absolute left-0 top-full mt-2 w-64 bg-white/95 backdrop-blur-2xl p-2 rounded-2xl border border-emerald-100 shadow-2xl shadow-emerald-500/15 z-50 animate-in fade-in zoom-in-95 duration-150">
-                        <div className="px-2 py-1.5 text-[13px] font-bold text-emerald-600 uppercase tracking-wider">Estimated Time</div>
-                        {[
-                          { value: 'all', label: 'All Durations', icon: Clock },
-                          { value: 'under2Weeks', label: '< 2 Weeks (Crash)', icon: Timer },
-                          { value: '2to4Weeks', label: '2–4 Weeks (Standard)', icon: Timer },
-                          { value: '1to3Months', label: '1–3 Months (Deep Dive)', icon: Timer },
-                          { value: '3PlusMonths', label: '3+ Months (Specialization)', icon: Timer },
-                          { value: 'selfPaced', label: 'Self-Paced & Books', icon: BookOpen }
-                        ].map(opt => {
-                          const Icon = opt.icon;
-                          const isSelected = durationFilter === opt.value;
-                          return (
-                            <button
-                              key={opt.value}
-                              type="button"
-                              onClick={() => { setDurationFilter(opt.value); setOpenDropdown(null); }}
-                              className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-[13px] font-bold transition-all mt-1 ${isSelected
-                                ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-500/30'
-                                : 'text-emerald-950 hover:bg-emerald-50'
-                                }`}
-                            >
-                              <div className="flex items-center gap-2">
-                                <Icon size={14} className={isSelected ? 'text-white' : 'text-emerald-600'} />
-                                <span>{opt.label}</span>
-                              </div>
-                              {isSelected && <Check size={14} className="stroke-[3]" />}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-
+                      ))}
+                    </div>
+                  )}
                 </div>
 
-                {/* Bottom Row: 2 Dropdowns */}
-                <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
-
-                  {/* Language Dropdown */}
-                  <div className="relative flex-1 min-w-[140px]" data-dropdown>
-                    <button
-                      type="button"
-                      onClick={() => setOpenDropdown(openDropdown === 'language' ? null : 'language')}
-                      className={`w-full flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-2xl border transition-all duration-200 ${openDropdown === 'language' || (languageFilter && languageFilter !== 'all')
-                        ? 'bg-rose-100/90 border-rose-300 text-rose-950 shadow-md shadow-rose-500/10'
-                        : 'bg-rose-50/70 hover:bg-rose-100/60 border-rose-200/70 text-rose-900'
-                        }`}
-                    >
-                      <div className="flex items-center gap-2 truncate">
-                        <div className="w-6 h-6 rounded-lg bg-rose-200/80 flex items-center justify-center text-rose-700 shrink-0">
-                          <Languages size={14} />
-                        </div>
-                        <div className="text-left truncate">
-                          <p className="text-[13px] font-bold uppercase tracking-wider text-rose-600">Language</p>
-                          <p className="text-[13px] font-extrabold truncate">
-                            {languageFilter === 'all' || !languageFilter ? 'All Languages' : languageFilter === 'english' ? 'English' : languageFilter === 'hindi' ? 'Hindi' : 'Other'}
-                          </p>
-                        </div>
+                {/* Level Dropdown */}
+                <div className="relative col-span-1 sm:flex-1 min-w-0" data-dropdown>
+                  <button
+                    type="button"
+                    onClick={() => setOpenDropdown(openDropdown === 'level' ? null : 'level')}
+                    className={`w-full flex items-center justify-between gap-1.5 px-3 py-2.5 sm:px-3.5 sm:py-2.5 rounded-2xl border transition-all duration-200 ${openDropdown === 'level' || levelFilter !== 'all'
+                      ? 'bg-purple-100/90 border-purple-300 text-purple-950 shadow-md shadow-purple-500/10'
+                      : 'bg-purple-50/70 hover:bg-purple-100/60 border-purple-200/70 text-purple-900'
+                      }`}
+                  >
+                    <div className="flex items-center gap-1.5 min-w-0 truncate">
+                      <div className="w-6 h-6 rounded-lg bg-purple-200/80 flex items-center justify-center text-purple-700 shrink-0">
+                        <BarChart3 size={14} />
                       </div>
-                      <ChevronDown
-                        size={14}
-                        className={`text-rose-600 shrink-0 transition-transform duration-200 ${openDropdown === 'language' ? 'rotate-180' : ''}`}
-                      />
-                    </button>
-
-                    {/* Language Popover Menu */}
-                    {openDropdown === 'language' && (
-                      <div className="absolute left-0 top-full mt-2 w-52 bg-white/95 backdrop-blur-2xl p-2 rounded-2xl border border-rose-100 shadow-2xl shadow-rose-500/15 z-50 animate-in fade-in zoom-in-95 duration-150">
-                        <div className="px-2 py-1.5 text-[13px] font-bold text-rose-600 uppercase tracking-wider">Select Language</div>
-                        {[
-                          { value: 'all', label: 'All Languages', icon: Globe2 },
-                          { value: 'english', label: 'English', icon: Languages },
-                          { value: 'hindi', label: 'Hindi', icon: Languages },
-                          { value: 'other', label: 'Other', icon: Sparkles }
-                        ].map(opt => {
-                          const Icon = opt.icon;
-                          const isSelected = (languageFilter || 'all') === opt.value;
-                          return (
-                            <button
-                              key={opt.value}
-                              type="button"
-                              onClick={() => { setLanguageFilter?.(opt.value); setOpenDropdown(null); }}
-                              className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-[13px] font-bold transition-all mt-1 ${isSelected
-                                ? 'bg-rose-500 text-white shadow-sm shadow-rose-500/30'
-                                : 'text-rose-950 hover:bg-rose-50'
-                                }`}
-                            >
-                              <div className="flex items-center gap-2">
-                                <Icon size={14} className={isSelected ? 'text-white' : 'text-rose-500'} />
-                                <span>{opt.label}</span>
-                              </div>
-                              {isSelected && <Check size={14} className="stroke-[3]" />}
-                            </button>
-                          );
-                        })}
+                      <div className="text-left min-w-0 truncate">
+                        <p className="text-[11px] sm:text-[13px] font-bold uppercase tracking-wider text-purple-600">Level</p>
+                        <p className="text-[12px] sm:text-[13px] font-extrabold truncate">
+                          {levelFilter === 'all' ? 'All Levels' : levelFilter === 'beginner' ? 'Beginner' : levelFilter === 'intermediate' ? 'Intermediate' : 'Advanced'}
+                        </p>
                       </div>
-                    )}
-                  </div>
+                    </div>
+                    <ChevronDown
+                      size={14}
+                      className={`text-purple-600 shrink-0 transition-transform duration-200 ${openDropdown === 'level' ? 'rotate-180' : ''}`}
+                    />
+                  </button>
 
-                  {/* Sort Dropdown */}
-                  <div className="relative flex-1 min-w-[140px]" data-dropdown>
-                    <button
-                      type="button"
-                      onClick={() => setOpenDropdown(openDropdown === 'sort' ? null : 'sort')}
-                      className={`w-full flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-2xl border transition-all duration-200 ${openDropdown === 'sort'
-                        ? 'bg-amber-100/90 border-amber-300 text-amber-950 shadow-md shadow-amber-500/10'
-                        : 'bg-amber-50/70 hover:bg-amber-100/60 border-amber-200/70 text-amber-900'
-                        }`}
-                    >
-                      <div className="flex items-center gap-2 truncate">
-                        <div className="w-6 h-6 rounded-lg bg-amber-200/80 flex items-center justify-center text-amber-700 shrink-0">
-                          <Sparkles size={14} />
-                        </div>
-                        <div className="text-left truncate">
-                          <p className="text-[13px] font-bold uppercase tracking-wider text-amber-600">Sort By</p>
-                          <p className="text-[13px] font-extrabold truncate">
-                            {sortBy === 'featured' ? 'Featured First' : sortBy === 'popular' ? 'Most Popular' : sortBy === 'rating' ? 'Highest Rated' : 'Alphabetical'}
-                          </p>
-                        </div>
+                  {openDropdown === 'level' && (
+                    <div className="absolute left-0 top-full mt-2 w-56 max-w-[85vw] bg-white backdrop-blur-2xl p-2 rounded-2xl border border-purple-100 shadow-2xl shadow-purple-500/20 z-50 animate-in fade-in zoom-in-95 duration-150">
+                      <div className="px-2 py-1.5 text-[13px] font-bold text-purple-600 uppercase tracking-wider">Difficulty Level</div>
+                      {[
+                        { value: 'all', label: 'All Levels', icon: GraduationCap },
+                        { value: 'beginner', label: 'Beginner Friendly', icon: BookOpen },
+                        { value: 'intermediate', label: 'Intermediate', icon: Zap },
+                        { value: 'advanced', label: 'Mastery / Advanced', icon: Sparkles }
+                      ].map(opt => {
+                        const Icon = opt.icon;
+                        const isSelected = levelFilter === opt.value;
+                        return (
+                          <button
+                            key={opt.value}
+                            type="button"
+                            onClick={() => { setLevelFilter(opt.value); setOpenDropdown(null); }}
+                            className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-[13px] font-bold transition-all mt-1 ${isSelected
+                              ? 'bg-purple-600 text-white shadow-sm shadow-purple-500/30'
+                              : 'text-purple-950 hover:bg-purple-50'
+                              }`}
+                          >
+                            <div className="flex items-center gap-2">
+                              <Icon size={14} className={isSelected ? 'text-white' : 'text-purple-500'} />
+                              <span>{opt.label}</span>
+                            </div>
+                            {isSelected && <Check size={14} className="stroke-[3]" />}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                {/* Duration Dropdown */}
+                <div className="relative col-span-1 sm:flex-1 min-w-0" data-dropdown>
+                  <button
+                    type="button"
+                    onClick={() => setOpenDropdown(openDropdown === 'duration' ? null : 'duration')}
+                    className={`w-full flex items-center justify-between gap-1.5 px-3 py-2.5 sm:px-3.5 sm:py-2.5 rounded-2xl border transition-all duration-200 ${openDropdown === 'duration' || durationFilter !== 'all'
+                      ? 'bg-emerald-100/90 border-emerald-300 text-emerald-950 shadow-md shadow-emerald-500/10'
+                      : 'bg-emerald-50/70 hover:bg-emerald-100/60 border-emerald-200/70 text-emerald-900'
+                      }`}
+                  >
+                    <div className="flex items-center gap-1.5 min-w-0 truncate">
+                      <div className="w-6 h-6 rounded-lg bg-emerald-200/80 flex items-center justify-center text-emerald-700 shrink-0">
+                        <Timer size={14} />
                       </div>
-                      <ChevronDown
-                        size={14}
-                        className={`text-amber-600 shrink-0 transition-transform duration-200 ${openDropdown === 'sort' ? 'rotate-180' : ''}`}
-                      />
-                    </button>
-
-                    {/* Sort Popover Menu */}
-                    {openDropdown === 'sort' && (
-                      <div className="absolute left-0 top-full mt-2 w-52 bg-white/95 backdrop-blur-2xl p-2 rounded-2xl border border-amber-100 shadow-2xl shadow-amber-500/15 z-50 animate-in fade-in zoom-in-95 duration-150">
-                        <div className="px-2 py-1.5 text-[13px] font-bold text-amber-600 uppercase tracking-wider">Sort Order</div>
-                        {[
-                          { value: 'featured', label: 'Featured First', icon: Sparkles },
-                          { value: 'popular', label: 'Most Popular', icon: Flame },
-                          { value: 'rating', label: 'Highest Rated', icon: Star },
-                          { value: 'titleAsc', label: 'Alphabetical (A–Z)', icon: ArrowDownAZ }
-                        ].map(opt => {
-                          const Icon = opt.icon;
-                          const isSelected = sortBy === opt.value;
-                          return (
-                            <button
-                              key={opt.value}
-                              type="button"
-                              onClick={() => { setSortBy(opt.value); setOpenDropdown(null); }}
-                              className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-[13px] font-bold transition-all mt-1 ${isSelected
-                                ? 'bg-amber-500 text-white shadow-sm shadow-amber-500/30'
-                                : 'text-amber-950 hover:bg-amber-50'
-                                }`}
-                            >
-                              <div className="flex items-center gap-2">
-                                <Icon size={14} className={isSelected ? 'text-white' : 'text-amber-600'} />
-                                <span>{opt.label}</span>
-                              </div>
-                              {isSelected && <Check size={14} className="stroke-[3]" />}
-                            </button>
-                          );
-                        })}
+                      <div className="text-left min-w-0 truncate">
+                        <p className="text-[11px] sm:text-[13px] font-bold uppercase tracking-wider text-emerald-600">Duration</p>
+                        <p className="text-[12px] sm:text-[13px] font-extrabold truncate">
+                          {durationFilter === 'all' ? 'All Durations' : durationFilter === 'under2Weeks' ? '< 2 Weeks' : durationFilter === '2to4Weeks' ? '2–4 Weeks' : durationFilter === '1to3Months' ? '1–3 Months' : durationFilter === '3PlusMonths' ? '3+ Months' : 'Self-Paced'}
+                        </p>
                       </div>
-                    )}
-                  </div>
+                    </div>
+                    <ChevronDown
+                      size={14}
+                      className={`text-emerald-600 shrink-0 transition-transform duration-200 ${openDropdown === 'duration' ? 'rotate-180' : ''}`}
+                    />
+                  </button>
 
+                  {openDropdown === 'duration' && (
+                    <div className="absolute left-0 top-full mt-2 w-64 max-w-[85vw] bg-white backdrop-blur-2xl p-2 rounded-2xl border border-emerald-100 shadow-2xl shadow-emerald-500/20 z-50 animate-in fade-in zoom-in-95 duration-150">
+                      <div className="px-2 py-1.5 text-[13px] font-bold text-emerald-600 uppercase tracking-wider">Estimated Time</div>
+                      {[
+                        { value: 'all', label: 'All Durations', icon: Clock },
+                        { value: 'under2Weeks', label: '< 2 Weeks (Crash)', icon: Timer },
+                        { value: '2to4Weeks', label: '2–4 Weeks (Standard)', icon: Timer },
+                        { value: '1to3Months', label: '1–3 Months (Deep Dive)', icon: Timer },
+                        { value: '3PlusMonths', label: '3+ Months (Specialization)', icon: Timer },
+                        { value: 'selfPaced', label: 'Self-Paced & Books', icon: BookOpen }
+                      ].map(opt => {
+                        const Icon = opt.icon;
+                        const isSelected = durationFilter === opt.value;
+                        return (
+                          <button
+                            key={opt.value}
+                            type="button"
+                            onClick={() => { setDurationFilter(opt.value); setOpenDropdown(null); }}
+                            className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-[13px] font-bold transition-all mt-1 ${isSelected
+                              ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-500/30'
+                              : 'text-emerald-950 hover:bg-emerald-50'
+                              }`}
+                          >
+                            <div className="flex items-center gap-2">
+                              <Icon size={14} className={isSelected ? 'text-white' : 'text-emerald-600'} />
+                              <span>{opt.label}</span>
+                            </div>
+                            {isSelected && <Check size={14} className="stroke-[3]" />}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                {/* Language Dropdown */}
+                <div className="relative col-span-1 sm:flex-1 min-w-0" data-dropdown>
+                  <button
+                    type="button"
+                    onClick={() => setOpenDropdown(openDropdown === 'language' ? null : 'language')}
+                    className={`w-full flex items-center justify-between gap-1.5 px-3 py-2.5 sm:px-3.5 sm:py-2.5 rounded-2xl border transition-all duration-200 ${openDropdown === 'language' || (languageFilter && languageFilter !== 'all')
+                      ? 'bg-rose-100/90 border-rose-300 text-rose-950 shadow-md shadow-rose-500/10'
+                      : 'bg-rose-50/70 hover:bg-rose-100/60 border-rose-200/70 text-rose-900'
+                      }`}
+                  >
+                    <div className="flex items-center gap-1.5 min-w-0 truncate">
+                      <div className="w-6 h-6 rounded-lg bg-rose-200/80 flex items-center justify-center text-rose-700 shrink-0">
+                        <Languages size={14} />
+                      </div>
+                      <div className="text-left min-w-0 truncate">
+                        <p className="text-[11px] sm:text-[13px] font-bold uppercase tracking-wider text-rose-600">Language</p>
+                        <p className="text-[12px] sm:text-[13px] font-extrabold truncate">
+                          {languageFilter === 'all' || !languageFilter ? 'All Languages' : languageFilter === 'english' ? 'English' : languageFilter === 'hindi' ? 'Hindi' : 'Other'}
+                        </p>
+                      </div>
+                    </div>
+                    <ChevronDown
+                      size={14}
+                      className={`text-rose-600 shrink-0 transition-transform duration-200 ${openDropdown === 'language' ? 'rotate-180' : ''}`}
+                    />
+                  </button>
+
+                  {openDropdown === 'language' && (
+                    <div className="absolute right-0 sm:left-0 top-full mt-2 w-52 max-w-[85vw] bg-white backdrop-blur-2xl p-2 rounded-2xl border border-rose-100 shadow-2xl shadow-rose-500/20 z-50 animate-in fade-in zoom-in-95 duration-150">
+                      <div className="px-2 py-1.5 text-[13px] font-bold text-rose-600 uppercase tracking-wider">Select Language</div>
+                      {[
+                        { value: 'all', label: 'All Languages', icon: Globe2 },
+                        { value: 'english', label: 'English', icon: Languages },
+                        { value: 'hindi', label: 'Hindi', icon: Languages },
+                        { value: 'other', label: 'Other', icon: Sparkles }
+                      ].map(opt => {
+                        const Icon = opt.icon;
+                        const isSelected = (languageFilter || 'all') === opt.value;
+                        return (
+                          <button
+                            key={opt.value}
+                            type="button"
+                            onClick={() => { setLanguageFilter?.(opt.value); setOpenDropdown(null); }}
+                            className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-[13px] font-bold transition-all mt-1 ${isSelected
+                              ? 'bg-rose-500 text-white shadow-sm shadow-rose-500/30'
+                              : 'text-rose-950 hover:bg-rose-50'
+                              }`}
+                          >
+                            <div className="flex items-center gap-2">
+                              <Icon size={14} className={isSelected ? 'text-white' : 'text-rose-500'} />
+                              <span>{opt.label}</span>
+                            </div>
+                            {isSelected && <Check size={14} className="stroke-[3]" />}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                {/* Sort Dropdown */}
+                <div className="relative col-span-2 sm:col-span-1 sm:flex-1 min-w-0" data-dropdown>
+                  <button
+                    type="button"
+                    onClick={() => setOpenDropdown(openDropdown === 'sort' ? null : 'sort')}
+                    className={`w-full flex items-center justify-between gap-1.5 px-3 py-2.5 sm:px-3.5 sm:py-2.5 rounded-2xl border transition-all duration-200 ${openDropdown === 'sort'
+                      ? 'bg-amber-100/90 border-amber-300 text-amber-950 shadow-md shadow-amber-500/10'
+                      : 'bg-amber-50/70 hover:bg-amber-100/60 border-amber-200/70 text-amber-900'
+                      }`}
+                  >
+                    <div className="flex items-center gap-1.5 min-w-0 truncate">
+                      <div className="w-6 h-6 rounded-lg bg-amber-200/80 flex items-center justify-center text-amber-700 shrink-0">
+                        <Sparkles size={14} />
+                      </div>
+                      <div className="text-left min-w-0 truncate">
+                        <p className="text-[11px] sm:text-[13px] font-bold uppercase tracking-wider text-amber-600">Sort By</p>
+                        <p className="text-[12px] sm:text-[13px] font-extrabold truncate">
+                          {sortBy === 'featured' ? 'Featured First' : sortBy === 'popular' ? 'Most Popular' : sortBy === 'rating' ? 'Highest Rated' : 'Alphabetical'}
+                        </p>
+                      </div>
+                    </div>
+                    <ChevronDown
+                      size={14}
+                      className={`text-amber-600 shrink-0 transition-transform duration-200 ${openDropdown === 'sort' ? 'rotate-180' : ''}`}
+                    />
+                  </button>
+
+                  {openDropdown === 'sort' && (
+                    <div className="absolute left-0 top-full mt-2 w-52 max-w-[85vw] bg-white backdrop-blur-2xl p-2 rounded-2xl border border-amber-100 shadow-2xl shadow-amber-500/20 z-50 animate-in fade-in zoom-in-95 duration-150">
+                      <div className="px-2 py-1.5 text-[13px] font-bold text-amber-600 uppercase tracking-wider">Sort Order</div>
+                      {[
+                        { value: 'featured', label: 'Featured First', icon: Sparkles },
+                        { value: 'popular', label: 'Most Popular', icon: Flame },
+                        { value: 'rating', label: 'Highest Rated', icon: Star },
+                        { value: 'titleAsc', label: 'Alphabetical (A–Z)', icon: ArrowDownAZ }
+                      ].map(opt => {
+                        const Icon = opt.icon;
+                        const isSelected = sortBy === opt.value;
+                        return (
+                          <button
+                            key={opt.value}
+                            type="button"
+                            onClick={() => { setSortBy(opt.value); setOpenDropdown(null); }}
+                            className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-[13px] font-bold transition-all mt-1 ${isSelected
+                              ? 'bg-amber-500 text-white shadow-sm shadow-amber-500/30'
+                              : 'text-amber-950 hover:bg-amber-50'
+                              }`}
+                          >
+                            <div className="flex items-center gap-2">
+                              <Icon size={14} className={isSelected ? 'text-white' : 'text-amber-600'} />
+                              <span>{opt.label}</span>
+                            </div>
+                            {isSelected && <Check size={14} className="stroke-[3]" />}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
 
               </div>
@@ -1200,12 +1300,12 @@ const AppContent = () => {
                 </span>
               </div>
 
-              {/* Vertical Buttons Stack */}
-              <div className="flex flex-col gap-2.5 flex-1 justify-center">
+              {/* Pricing Buttons */}
+              <div className="grid grid-cols-3 lg:flex lg:flex-col gap-2.5 flex-1 justify-center">
                 <button
                   type="button"
                   onClick={() => setPriceFilter('all')}
-                  className={`w-full text-center py-2.5 px-3 rounded-xl text-[15px] font-extrabold transition-all duration-200 cursor-pointer ${priceFilter === 'all'
+                  className={`w-full text-center py-2.5 px-2 sm:px-3 rounded-xl text-[13px] sm:text-[15px] font-extrabold transition-all duration-200 cursor-pointer ${priceFilter === 'all'
                     ? 'bg-sky-500 text-white shadow-md shadow-sky-500/30 scale-[1.02]'
                     : 'bg-white/80 text-orange-500 border border-indigo-100/60 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 shadow-sm'
                     }`}
@@ -1216,7 +1316,7 @@ const AppContent = () => {
                 <button
                   type="button"
                   onClick={() => setPriceFilter('free')}
-                  className={`w-full text-center py-2.5 px-3 rounded-xl text-[15px] font-extrabold transition-all duration-200 cursor-pointer ${priceFilter === 'free'
+                  className={`w-full text-center py-2.5 px-2 sm:px-3 rounded-xl text-[13px] sm:text-[15px] font-extrabold transition-all duration-200 cursor-pointer ${priceFilter === 'free'
                     ? 'bg-yellow-500 text-white shadow-md shadow-emerald-600/30 scale-[1.02]'
                     : 'bg-white/80 text-orange-500 border border-indigo-100/60 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 shadow-sm'
                     }`}
@@ -1227,7 +1327,7 @@ const AppContent = () => {
                 <button
                   type="button"
                   onClick={() => setPriceFilter('paid')}
-                  className={`w-full text-center py-2.5 px-3 rounded-xl text-[15px] font-extrabold transition-all duration-200 cursor-pointer ${priceFilter === 'paid'
+                  className={`w-full text-center py-2.5 px-2 sm:px-3 rounded-xl text-[13px] sm:text-[15px] font-extrabold transition-all duration-200 cursor-pointer ${priceFilter === 'paid'
                     ? 'bg-violet-600 text-white shadow-md shadow-violet-600/30 scale-[1.02]'
                     : 'bg-white/80 text-orange-500 border border-indigo-100/60 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 shadow-sm'
                     }`}
@@ -1235,13 +1335,11 @@ const AppContent = () => {
                   Paid Courses
                 </button>
               </div>
-
             </div>
-
           </div>
         </div>
 
-        {/* Course Cards */}
+        {/* Course Cards Feed */}
         {isSyncing ? (
           <div className="bg-white border border-zinc-200 rounded-2xl p-16 text-center shadow-sm">
             <div className="inline-block w-8 h-8 border-3 border-zinc-900 border-t-transparent rounded-full animate-spin mb-4" />
@@ -1287,7 +1385,7 @@ const AppContent = () => {
             className="bg-white rounded-3xl max-w-5xl w-full p-6 shadow-2xl border border-pink-100 my-8"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Modal Header - Violet Theme */}
+            {/* Modal Header */}
             <div className="flex items-center justify-between pb-4 border-b border-violet-100 mb-6">
               <div>
                 <h3 className="text-xl font-extrabold text-slate-900 flex items-center gap-2">
@@ -1376,7 +1474,7 @@ const AppContent = () => {
         </div>
       )}
 
-      {/* Auth */}
+      {/* Auth Modal */}
       <LoginForm
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
