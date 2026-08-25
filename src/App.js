@@ -383,8 +383,10 @@ const AppContent = () => {
           fetch('https://hn.algolia.com/api/v1/search?query=coursera+specialization&tags=story&hitsPerPage=50'),
 
           // CodeCamp Live Streams
+          fetch('https://dev.to/api/articles?tag=freecodecamp&per_page=50'),
           fetch('https://dev.to/api/articles?username=freecodecamp&per_page=50'),
-          fetch('https://hn.algolia.com/api/v1/search?query=freecodecamp+curriculum&tags=story&hitsPerPage=50')
+          fetch('https://hn.algolia.com/api/v1/search?query=freecodecamp&tags=story&hitsPerPage=50'),
+          fetch('https://hn.algolia.com/api/v1/search?query=free+code+camp&tags=story&hitsPerPage=50')
         ]);
 
         const [
@@ -394,7 +396,7 @@ const AppContent = () => {
           hn1, hn2,
           apple1, apple2, apple3,
           coursera1, coursera2,
-          fcc1, fcc2
+          fcc1, fcc2, fcc3, fcc4
         ] = results;
 
         const liveCourses = [];
@@ -568,24 +570,27 @@ const AppContent = () => {
         }
 
         // 7. Parse CodeCamp
-        for (const res of [fcc1, fcc2]) {
-          const articlesOrHits = await readJson(res);
-          const list = Array.isArray(articlesOrHits) ? articlesOrHits : (articlesOrHits?.hits || []);
+        for (const res of [fcc1, fcc2, fcc3, fcc4]) {
+          const data = await readJson(res);
+          const list = Array.isArray(data) ? data : (data?.hits || []);
           list.forEach(item => {
             const title = item.title;
-            const url = item.url || (item.objectID ? `https://news.ycombinator.com/item?id=${item.objectID}` : null);
+            const url = item.url && item.url.startsWith('http')
+              ? item.url
+              : (item.objectID ? `https://news.ycombinator.com/item?id=${item.objectID}` : null);
             if (!title || !url) return;
+
             const { category, subcategory } = classifyText(title, item.description || '', (item.tag_list || []).join(' '));
             liveCourses.push({
               id: `fcc-${item.id || item.objectID}`,
-              title: `${title} (CodeCamp Track)`,
-              description: item.description || `Master ${subcategory} through interactive coding challenges.`,
+              title: `${title.replace(/\[.*?\]|\(.*?\)/g, '').trim()} (CodeCamp Track)`,
+              description: item.description || `Interactive freeCodeCamp curriculum on ${subcategory}.`,
               category,
               subcategory,
               provider: 'CodeCamp',
               isFree: true,
               rating: '4.9',
-              enrolled: '120k+ learners',
+              enrolled: `${item.positive_reactions_count ? item.positive_reactions_count * 20 : (item.points ? item.points * 12 : 95)}k+`,
               level: 'All Levels',
               duration: '300 Hours',
               url: url,
