@@ -1,10 +1,23 @@
-# 🎓 CourseVerse Hub – Multi-Source Course Discovery & Comparison
+# 🎓 CourseVerse Hub – Multi-Source Course Aggregator & Comparison Platform
 
-> **Discover, filter, and compare courses from multiple educational platforms in one place.**
+> **A modern, multi-platform course aggregation and curriculum comparison platform for discovering, filtering, and evaluating technical learning resources from across the open web.**
 
-CourseVerse Hub is a modern, responsive **course discovery and comparison platform** built with **React** and **Tailwind CSS**. It aggregates educational content from multiple public sources, normalizes diverse course data into a unified format, and provides powerful filtering, syllabus previews, bookmarking, and side-by-side course comparison.
+[![React](https://img.shields.io/badge/React-18.3-61DAFB?logo=react&logoColor=black)](https://react.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![Vercel](https://img.shields.io/badge/Vercel-Serverless-000000?logo=vercel&logoColor=white)](https://vercel.com/)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-The platform is designed to simplify learning-resource discovery by bringing courses, tutorials, lectures, and open educational content into a single searchable interface.
+---
+
+## 📖 Overview
+
+**CourseVerse Hub** is a responsive course aggregation and comparison platform built with **React** and **Tailwind CSS**.
+
+The platform addresses the fragmentation of online technical education by aggregating and normalizing learning resources from multiple public sources into a unified interface.
+
+Users can discover courses, apply multi-dimensional filters, inspect syllabus highlights, save learning resources, and compare up to four courses side-by-side.
+
+The application also includes a **resilient dual-layer data architecture** that can fall back to client-side API aggregation when the primary serverless endpoint is unavailable.
 
 ---
 
@@ -12,451 +25,455 @@ The platform is designed to simplify learning-resource discovery by bringing cou
 
 ### 🌐 Multi-Source Course Aggregation
 
-- Aggregates educational content from multiple public APIs
-- Fetches data from multiple sources in parallel
-- Normalizes different API response formats into a unified course model
-- Supports optional custom backend integration
-- Client-side fallback when the primary backend is unavailable
+- Aggregates educational resources from multiple public platforms and APIs.
+- Normalizes heterogeneous API responses into a unified course structure.
+- Supports serverless backend aggregation with client-side fallback.
+- Fetches multiple API streams concurrently using `Promise.allSettled()`.
 
-### 🔍 Smart Course Discovery
+### 🛡️ Resilient Dual-Layer Data Pipeline
 
-- Global course search
-- Keyword-based course classification
-- Automatic technical domain assignment
-- Platform-based filtering
-- Free vs. paid filtering
-- Difficulty-level filtering
-- Duration-based filtering
+- Primary aggregation through a Vercel Serverless API route.
+- Automatic client-side failover when the primary endpoint is unavailable.
+- Concurrent requests across multiple public REST endpoints.
+- Individual API failures do not prevent successful sources from loading.
 
-### 🧭 Advanced Filtering & Sorting
+### 🏷️ Automated Course Classification
 
-Filter courses by:
+- Keyword-based heuristic classification engine.
+- Automatically categorizes incoming resources by technical domain.
+- Supports a structured taxonomy covering programming, technology, AI, design, business, and languages.
+- Maps resources into domain-specific subcategories.
 
-- 💻 Programming
-- 🤖 AI & Data
-- 🌐 Web & Computer Science
-- 🎨 Design
-- 💼 Business
-- 🗣️ Languages
+### ⚡ Advanced Filtering & Sorting
 
-Additional filters include:
+Courses can be filtered and sorted by:
 
-- **Tuition:** Free / Paid
-- **Difficulty:** Beginner / Intermediate / Advanced
-- **Duration:** Crash Course / Standard / Deep Dive / Specialization / Self-Paced
-- **Sorting:** Featured / Popularity / Rating / Alphabetical
+- 🔎 Search query
+- 💻 Domain
+- 🏷️ Subcategory
+- 🌐 Provider
+- 💰 Free / Paid
+- 📊 Difficulty
+- ⏱️ Duration
+- ⭐ Rating
+- 🔤 Alphabetical order
+- 🔥 Featured / popularity
 
 ### ⚖️ Side-by-Side Course Comparison
 
-- Select up to **4 courses**
-- Compare courses simultaneously
+- Compare up to **4 courses simultaneously**.
 - Compare:
-  - Platform
+  - Provider
   - Rating
   - Tuition
   - Duration
   - Difficulty
   - Certification
   - Course commitment
+  - Course highlights
 
-### 📚 Syllabus Preview
+### 📑 Syllabus Highlights
 
-- Detailed course information modal
-- Course highlights
-- Prerequisites
-- Duration
-- Platform information
-- Direct course/resource links
+- Detailed course information modal.
+- Course descriptions and learning highlights.
+- Prerequisite information.
+- Certification details.
+- Direct links to official learning resources.
 
-### 🔖 Saved Learning Library
+### 💾 Persistent Saved Library
 
-- Bookmark courses for later
-- Persistent saved courses using `localStorage`
-- Access saved resources across browser sessions
+- Bookmark courses for later.
+- Persistent storage using browser `localStorage`.
+- Saved courses remain available across browser sessions.
 
 ### 🔐 Authentication Experience
 
-- Application-wide authentication state
-- Email-based authentication simulation
-- Google OAuth popup simulation
-- GitHub OAuth popup simulation
-- React Context-based authentication state
+- Centralized React Context authentication state.
+- Email-based authentication simulation.
+- Google OAuth popup simulation.
+- GitHub OAuth popup simulation.
+- Application-wide authentication state management.
 
 ---
 
-# 🛠️ Tech Stack
-
-| Technology | Purpose |
-|------------|---------|
-| React 18 | Frontend Framework |
-| JavaScript ES6+ | Application Logic |
-| Tailwind CSS | UI Styling |
-| Custom CSS | Glassmorphism Design System |
-| React Context API | Authentication State |
-| React Hooks | State & Lifecycle Management |
-| Fetch API | API Communication |
-| `Promise.allSettled()` | Parallel API Aggregation |
-| `useMemo()` | Optimized Filtering |
-| `localStorage` | Persistent Bookmarks |
-| Lucide React | UI Icons |
-
----
-
-# 🌐 Data Sources
-
-CourseVerse Hub integrates educational content from multiple public sources.
-
-| Source | Data |
-|--------|------|
-| FreeCodeCamp | Open curriculum and learning tracks |
-| Hacker News Algolia | Curated educational repositories and resources |
-| Open Library | Educational books and learning resources |
-| DEV.to | Course and educational articles |
-| Custom Backend | Optional normalized course API |
-
-> Availability and response formats of external APIs may change over time.
-
----
-
-# 🧠 Architecture
-
-CourseVerse Hub uses a resilient multi-source aggregation pipeline.
+## 🏗️ System Architecture
 
 ```text
-                 ┌─────────────────────┐
-                 │   CourseVerse Hub   │
-                 └──────────┬──────────┘
-                            │
-                            ▼
-                ┌───────────────────────┐
-                │ Multi-Source Fetcher  │
-                └───────────┬───────────┘
-                            │
-          ┌─────────────────┼─────────────────┐
-          │                 │                 │
-          ▼                 ▼                 ▼
-     FreeCodeCamp      Open Library        DEV.to
-          │                 │                 │
-          └─────────────────┼─────────────────┘
-                            │
-                            ▼
-                  Hacker News / Backend
-                            │
-                            ▼
-                ┌───────────────────────┐
-                │ Data Normalization    │
-                └───────────┬───────────┘
-                            │
-                            ▼
-                 ┌──────────────────────┐
-                 │ Classification       │
-                 │ & Taxonomy Engine    │
-                 └──────────┬───────────┘
-                            │
-                            ▼
-                 ┌──────────────────────┐
-                 │ Unified Course Model │
-                 └──────────┬───────────┘
-                            │
-                            ▼
-              Search • Filter • Compare
-                            │
-                            ▼
-                 Saved Learning Library
+                         ┌─────────────────────────┐
+                         │     CourseVerse Hub     │
+                         │       Web Client        │
+                         └────────────┬────────────┘
+                                      │
+                    ┌─────────────────┴─────────────────┐
+                    │                                   │
+                    ▼                                   ▼
+        ┌──────────────────────┐            ┌──────────────────────┐
+        │ Primary Serverless   │            │ Browser Failover     │
+        │ Aggregation Route    │            │ Aggregation Mode     │
+        │ /api/all-live-courses│            │ Promise.allSettled() │
+        └──────────┬───────────┘            └──────────┬───────────┘
+                   │                                   │
+                   │                    ┌──────────────┼──────────────┐
+                   │                    ▼              ▼              ▼
+                   │               Open Library      DEV.to       WikiBooks
+                   │
+                   │                    ┌──────────────┼──────────────┐
+                   │                    ▼              ▼              ▼
+                   │               Hacker News      Apple APIs    Public Feeds
+                   │
+                   └───────────────────┬──────────────────────────────┘
+                                       ▼
+                         ┌─────────────────────────┐
+                         │ Data Normalization      │
+                         │ Unified Course Schema   │
+                         └────────────┬────────────┘
+                                      ▼
+                         ┌─────────────────────────┐
+                         │ Heuristic Classifier    │
+                         │ Domain & Subcategory    │
+                         └────────────┬────────────┘
+                                      ▼
+                         ┌─────────────────────────┐
+                         │ Filtering & Sorting     │
+                         │ Search / Compare / Save │
+                         └─────────────────────────┘
 ```
 
 ---
 
-# ⚡ Architectural Highlights
+## 🧠 Technical Highlights
 
-### 🔄 Resilient Aggregation Pipeline
+### 🔄 Concurrent API Aggregation
 
-CourseVerse uses `Promise.allSettled()` to request multiple external sources concurrently.
-
-This allows individual API failures to be isolated without preventing the remaining sources from loading.
+The client-side fallback pipeline uses `Promise.allSettled()` to execute multiple API requests concurrently.
 
 ```javascript
 const results = await Promise.allSettled([
-  fetchFreeCodeCamp(),
-  fetchHackerNews(),
   fetchOpenLibrary(),
   fetchDevTo(),
+  fetchWikiBooks(),
+  fetchHackerNews(),
 ]);
 ```
 
-Successful responses are normalized while unavailable sources can be safely skipped.
+This allows successful sources to continue loading even when individual endpoints fail.
 
----
+### 🧹 Data Normalization
 
-### 🧹 Unified Data Normalization
+Different providers expose different response structures.
 
-Different APIs expose different field structures.
-
-CourseVerse transforms these responses into a common course representation containing fields such as:
+CourseVerse transforms incoming data into a consistent course model containing fields such as:
 
 ```text
-Title
-Description
-Platform
-Category
-Difficulty
-Duration
-Price
-Rating
-Certification
-URL
+id
+title
+description
+category
+subcategory
+provider
+isFree
+rating
+enrolled
+level
+duration
+url
+hasCertificate
+highlights
 ```
 
-This allows courses from completely different sources to be displayed and compared through the same UI.
+This unified structure allows resources from different providers to be filtered and compared through the same interface.
 
----
+### 🧠 Heuristic Classification
 
-### 🧠 Smart Classification
-
-Incoming resources are categorized using keyword-based heuristics to automatically assign them to relevant learning domains and technical tracks.
-
-Example:
+Course metadata is analyzed using keyword-based classification rules.
 
 ```text
-React + JavaScript + Frontend
-        ↓
-Web Development
-        ↓
-Frontend Development
+Course Metadata
+      ↓
+Keyword Analysis
+      ↓
+Domain Classification
+      ↓
+Subcategory Assignment
+      ↓
+Unified Course Object
 ```
 
----
+### ⚡ Memoized Filtering
 
-### ⚡ Optimized Client-Side Filtering
-
-React `useMemo()` is used to memoize filtered and sorted course collections, reducing unnecessary recalculation during UI interactions.
-
-Filtering can combine:
-
-```text
-Search
-   +
-Platform
-   +
-Domain
-   +
-Price
-   +
-Difficulty
-   +
-Duration
-   +
-Rating
-```
+React `useMemo()` is used to optimize expensive filtering and sorting operations and reduce unnecessary recalculation during UI interactions.
 
 ---
 
-# 📂 Project Structure
+## 🗂️ Taxonomy Structure
+
+| Domain | Subcategories |
+|---|---|
+| **Programming** | Python, JavaScript & TypeScript, C / C++, Java & Spring, Rust & Go, Algorithms & DS, Full Stack |
+| **Tech & CS** | Web Development, Mobile Dev, DevOps & Cloud, Cybersecurity, System Design |
+| **AI & Data** | Machine Learning, Data Science, LLMs & GenAI, Deep Learning, Computer Vision |
+| **Design & Creative** | UI/UX Design, 3D Animation, Graphic Design, Figma & Design Systems |
+| **Business & SaaS** | Digital Marketing, Product Management, Startup Growth, Fintech & Sales |
+| **Languages** | English, Spanish, French, German, Japanese, Mandarin |
+
+---
+
+## 🌐 Data Sources
+
+CourseVerse Hub can aggregate resources from multiple public sources, including:
+
+| Provider | Source |
+|---|---|
+| **FreeCodeCamp** | Public curriculum and learning resources |
+| **Open Library** | Open Library APIs |
+| **DEV.to** | Public article API |
+| **WikiBooks** | Public educational resources |
+| **Hacker News** | Algolia Search API |
+| **Apple** | Public podcast directory resources |
+| **Custom Backend** | Optional normalized REST endpoint |
+
+> External API availability and response formats may change over time.
+
+---
+
+## 📂 Project Structure
 
 ```text
-courseverse-hub/
+courseverse/
+├── api/
+│   └── Courses.js
+│       # Vercel Serverless Function & course aggregation logic
+│
+├── public/
+│   └── index.html
+│       # Application HTML entry point
 │
 ├── src/
 │   ├── components/
 │   │   ├── LessonList.js
-│   │   │   # Course grid, cards, syllabus modal & actions
+│   │   │   # Course cards, grid, syllabus modal & actions
 │   │   │
 │   │   └── LoginForm.js
 │   │       # Authentication modal & OAuth simulation
 │   │
-│   ├── context/
-│   │   └── AuthContext.js
-│   │       # Global authentication state
-│   │
 │   ├── App.js
-│   │   # Aggregation, filtering & comparison logic
+│   │   # Core application logic, filtering & comparison
 │   │
 │   ├── App.css
-│   │   # Glassmorphism styles & UI utilities
+│   │   # Glassmorphism UI & custom styling
 │   │
 │   └── index.js
 │       # React application entry point
 │
-├── public/
 ├── package.json
 └── README.md
 ```
 
 ---
 
-# 🚀 Getting Started
+## 🚀 Getting Started
 
-## Prerequisites
+### Prerequisites
 
-Make sure you have:
+Make sure you have the following installed:
 
-- Node.js **v16 or later**
-- npm or Yarn
+- **Node.js v16+**
+- **npm** or **Yarn**
 
----
-
-## 1. Clone the Repository
+### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/vivekjoshi2006/CourseVerse.git
-```
-
----
-
-## 2. Navigate to the Project
-
-```bash
 cd CourseVerse
 ```
 
----
-
-## 3. Install Dependencies
+### 2. Install Dependencies
 
 ```bash
 npm install
 ```
 
----
+### 3. Configure Environment Variables
 
-## 4. Configure Backend (Optional)
-
-If you are using the optional custom backend, create a `.env` file in the project root:
+Create a `.env` file in the project root if a custom backend endpoint is being used:
 
 ```env
-REACT_APP_API_URL=http://localhost:5001
+REACT_APP_API_URL=
 ```
 
-If the backend is unavailable, CourseVerse automatically falls back to direct client-side API aggregation.
+Leave the value empty when using the Vercel Serverless API.
 
----
-
-## 5. Start the Development Server
+### 4. Run the Application
 
 ```bash
 npm start
 ```
 
----
-
-## 6. Open the Application
-
-Visit:
+Open:
 
 ```text
 http://localhost:3000
 ```
 
----
+### 5. Run Vercel Serverless Functions Locally
 
-# 📦 Available Scripts
+To emulate the Vercel environment locally:
 
-| Command | Description |
-|---------|-------------|
-| `npm start` | Starts the development server |
-| `npm run build` | Creates a production build |
-| `npm test` | Runs the test suite |
-
----
-
-# 🎯 Core User Workflow
-
-```text
-Discover Courses
-       ↓
-Search & Filter
-       ↓
-Preview Syllabus
-       ↓
-Compare Courses
-       ↓
-Save to Library
-       ↓
-Launch Learning Resource
+```bash
+npx vercel dev
 ```
 
 ---
 
-# 📱 Responsive Design
+## 🔌 API Reference
 
-CourseVerse Hub is designed for:
+### `GET /api/all-live-courses`
+
+Returns normalized course resources from the configured aggregation pipeline.
+
+#### Query Parameters
+
+| Parameter | Type | Description |
+|---|---|---|
+| `q` | string | Optional search query matching course title, description, category, or provider |
+
+#### Example
+
+```text
+GET /api/all-live-courses?q=python
+```
+
+#### Example Response
+
+```json
+{
+  "success": true,
+  "count": 217,
+  "courses": [
+    {
+      "id": "fcc-programming-python",
+      "title": "Python Master Curriculum & Certification",
+      "description": "Complete interactive Python learning curriculum.",
+      "category": "programming",
+      "subcategory": "Python",
+      "provider": "CodeCamp",
+      "isFree": true,
+      "rating": "4.9",
+      "enrolled": "120k+",
+      "level": "Beginner",
+      "duration": "300 Hours",
+      "url": "https://www.freecodecamp.org/",
+      "tag": "100% Free Verified",
+      "hasCertificate": true,
+      "highlights": [
+        "Interactive browser environment",
+        "Portfolio projects",
+        "Digital certification"
+      ]
+    }
+  ]
+}
+```
+
+---
+
+## 🎨 UI & UX
+
+CourseVerse Hub uses a modern glassmorphism-inspired interface featuring:
+
+- 🪟 Frosted glass cards
+- ✨ Soft gradient effects
+- 📱 Responsive layouts
+- 🔍 Interactive search
+- 🎛️ Dynamic filtering controls
+- ⚖️ Comparison workspace
+- 📑 Modal-based syllabus previews
+- 🔖 Persistent bookmarks
+- 🎞️ Smooth UI transitions
+
+---
+
+## 📱 Responsive Design
+
+The interface is optimized for:
 
 - 💻 Desktop
 - 💼 Laptop
 - 📱 Mobile
 - 📟 Tablet
 
-The interface adapts course grids, comparison tables, filters, and modals for different screen sizes.
+Course cards, filters, comparison views, and modal interfaces adapt to different screen sizes.
 
 ---
 
-# 🎨 UI & UX
+## 🚢 Deployment
 
-The application features a modern **Glassmorphism-inspired interface** with:
+### Vercel
 
-- Frosted glass cards
-- Responsive course grids
-- Smooth transitions
-- Soft gradients
-- Interactive modals
-- Dynamic filtering
-- Clean learning-resource presentation
+CourseVerse Hub is configured for deployment on Vercel.
 
----
+1. Push the repository to GitHub.
+2. Open the Vercel Dashboard.
+3. Import the repository.
+4. Configure environment variables if required.
+5. Deploy the application.
 
-# 🚀 Future Enhancements
-
-- Real OAuth authentication
-- User profiles
-- Personalized learning paths
-- Course progress tracking
-- AI-powered course recommendations
-- Advanced recommendation engine
-- Course reviews and ratings
-- More educational platforms
-- Server-side caching
-- PostgreSQL database integration
-- Advanced search indexing
-- Learning analytics dashboard
+The `/api` directory can be deployed as Vercel Serverless Functions.
 
 ---
 
-# 🤝 Contributing
+## 🔮 Future Enhancements
 
-Contributions are welcome!
+- 🤖 AI-powered course recommendations
+- 🧭 Personalized learning paths
+- 👤 Real OAuth authentication
+- 📊 Learning progress tracking
+- ⭐ User reviews and ratings
+- 🔎 Advanced search indexing
+- 🗄️ Persistent database integration
+- 📈 Learning analytics dashboard
+- 🌐 Additional educational platforms
+- ⚡ Server-side caching and optimization
 
-### 1. Fork the Repository
+---
 
-### 2. Create a Feature Branch
+## 🤝 Contributing
+
+Contributions are welcome.
+
+1. Fork the repository.
+2. Create a feature branch:
 
 ```bash
 git checkout -b feature/new-feature
 ```
 
-### 3. Commit Your Changes
+3. Commit your changes:
 
 ```bash
 git commit -m "Add new feature"
 ```
 
-### 4. Push Your Branch
+4. Push the branch:
 
 ```bash
 git push origin feature/new-feature
 ```
 
-### 5. Open a Pull Request
+5. Open a Pull Request.
 
 ---
 
-# 📄 License
+## 📄 License
 
 This project is licensed under the **MIT License**.
 
+See the [LICENSE](LICENSE) file for details.
+
 ---
 
-# 👨‍💻 Author
+## 👨‍💻 Author
 
-Developed with ❤️ using **React**, **JavaScript**, **Tailwind CSS**, and modern web APIs.
+**Vivek Joshi**
 
-If you found CourseVerse Hub useful, consider giving the repository a ⭐ on GitHub.
+Built with ⚡ React, JavaScript, Tailwind CSS, REST APIs, and modern web technologies.
