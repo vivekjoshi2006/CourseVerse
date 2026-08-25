@@ -1241,7 +1241,7 @@ const AppContent = () => {
                       <div className="text-left min-w-0 truncate">
                         <p className="text-[11px] sm:text-[13px] font-bold uppercase tracking-wider text-amber-600">Sort By</p>
                         <p className="text-[12px] sm:text-[13px] font-extrabold truncate">
-                          {sortBy === 'featured' ? 'Featured First' : sortBy === 'popular' ? 'Most Popular' : sortBy === 'rating' ? 'Highest Rated' : 'Alphabetical'}
+                          {sortBy === 'featured' ? 'Featured' : sortBy === 'popular' ? 'Most Popular' : sortBy === 'rating' ? 'Highest Rated' : 'Alphabetical'}
                         </p>
                       </div>
                     </div>
