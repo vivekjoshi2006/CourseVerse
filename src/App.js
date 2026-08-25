@@ -352,45 +352,31 @@ const AppContent = () => {
     } catch (backendErr) {
       console.warn('Backend offline, pulling live streams directly from public APIs in browser...');
       try {
-        // Fetch real live streams across all subjects
-        const [
+        const results = await Promise.allSettled([
           // Open Library
-          olCsRes, olProgRes, olAiRes,
-          // DEV.to General
-          devCourseRes, devPyRes, devJsRes, devAiRes,
-          // WikiBooks
-          wikiCsRes, wikiProgRes, wikiLangRes,
-          // Hacker Hub
-          hnCourseRes, hnTutorialRes,
-          // Apple Podcasts
-          appleProgRes, appleAiRes, appleTechRes, appleBizRes,
-          // Coursera Live Streams
-          courseraLiveRes, courseraSpecRes,
-          // CodeCamp Official Live Streams
-          fccOfficialRes, fccHnRes
-        ] = await Promise.allSettled([
           fetch('https://openlibrary.org/subjects/computer_science.json?limit=50'),
           fetch('https://openlibrary.org/subjects/programming.json?limit=50'),
           fetch('https://openlibrary.org/subjects/artificial_intelligence.json?limit=50'),
 
+          // DEV.to
           fetch('https://dev.to/api/articles?tag=course&per_page=30'),
           fetch('https://dev.to/api/articles?tag=python&per_page=30'),
           fetch('https://dev.to/api/articles?tag=javascript&per_page=30'),
           fetch('https://dev.to/api/articles?tag=ai&per_page=30'),
 
+          // WikiBooks
           fetch('https://en.wikibooks.org/w/api.php?action=query&list=categorymembers&cmtitle=Category:Subject:Computer_science&format=json&cmlimit=50&origin=*'),
           fetch('https://en.wikibooks.org/w/api.php?action=query&list=categorymembers&cmtitle=Category:Subject:Programming&format=json&cmlimit=50&origin=*'),
           fetch('https://en.wikibooks.org/w/api.php?action=query&list=categorymembers&cmtitle=Category:Subject:Languages&format=json&cmlimit=50&origin=*'),
 
-          // Broad Hacker News queries
+          // Hacker Hub
           fetch('https://hn.algolia.com/api/v1/search?query=course&tags=story&hitsPerPage=50'),
           fetch('https://hn.algolia.com/api/v1/search?query=tutorial&tags=story&hitsPerPage=50'),
 
-          // Multi-domain Apple podcast queries
+          // Apple Podcasts
           fetch('https://itunes.apple.com/search?term=programming+course&media=podcast&limit=40'),
-          fetch('https://itunes.apple.com/search?term=machine+learning+podcast&media=podcast&limit=40'),
           fetch('https://itunes.apple.com/search?term=computer+science&media=podcast&limit=40'),
-          fetch('https://itunes.apple.com/search?term=business+management+course&media=podcast&limit=40'),
+          fetch('https://itunes.apple.com/search?term=machine+learning+podcast&media=podcast&limit=40'),
 
           // Coursera Live Streams
           fetch('https://hn.algolia.com/api/v1/search?query=coursera+course&tags=story&hitsPerPage=50'),
@@ -400,134 +386,144 @@ const AppContent = () => {
           fetch('https://dev.to/api/articles?username=freecodecamp&per_page=50'),
           fetch('https://hn.algolia.com/api/v1/search?query=freecodecamp+curriculum&tags=story&hitsPerPage=50')
         ]);
+
+        const [
+          ol1, ol2, ol3,
+          dev1, dev2, dev3, dev4,
+          wiki1, wiki2, wiki3,
+          hn1, hn2,
+          apple1, apple2, apple3,
+          coursera1, coursera2,
+          fcc1, fcc2
+        ] = results;
+
         const liveCourses = [];
 
-        // 1. Parse Open Library
-        [olCsRes, olProgRes, olAiRes, olWebRes].forEach(res => {
-          if (res.status === 'fulfilled' && res.value.ok) {
-            res.value.json().then(data => {
-              (data.works || []).forEach((work, idx) => {
-                const authors = (work.authors || []).map(a => a.name).join(', ') || 'Academic Faculty';
-                const { category, subcategory } = classifyText(work.title, (work.subject || []).join(' '));
-                liveCourses.push({
-                  id: `ol-${work.key.replace(/\//g, '-')}-${idx}`,
-                  title: work.title,
-                  description: `Complete academic syllabus and textbook on ${subcategory} by ${authors}.`,
-                  category,
-                  subcategory,
-                  provider: 'Open Library',
-                  isFree: true,
-                  rating: '4.8',
-                  enrolled: `${(work.edition_count || 1) * 3}k+ reads`,
-                  level: idx % 2 === 0 ? 'Advanced' : 'Beginner',
-                  duration: 'Complete Book Track',
-                  url: `https://openlibrary.org${work.key}`,
-                  gradient: GRADIENTS['Open Library'],
-                  tag: 'Academic Track',
-                  hasCertificate: false,
-                  highlights: ['Full academic syllabus', 'Foundational concepts', 'Internet Archive library edition']
-                });
-              });
-            }).catch(() => { });
+        // Safely read JSON
+        const readJson = async (res) => {
+          if (res && res.status === 'fulfilled' && res.value && res.value.ok) {
+            try { return await res.value.json(); } catch { return null; }
           }
-        });
+          return null;
+        };
+
+        // 1. Parse Open Library
+        for (const res of [ol1, ol2, ol3]) {
+          const data = await readJson(res);
+          (data?.works || []).forEach((work, idx) => {
+            const authors = (work.authors || []).map(a => a.name).join(', ') || 'Academic Faculty';
+            const { category, subcategory } = classifyText(work.title, (work.subject || []).join(' '));
+            liveCourses.push({
+              id: `ol-${(work.key || idx).toString().replace(/\//g, '-')}`,
+              title: work.title,
+              description: `Complete academic syllabus on ${subcategory} by ${authors}.`,
+              category,
+              subcategory,
+              provider: 'Open Library',
+              isFree: true,
+              rating: '4.8',
+              enrolled: `${(work.edition_count || 1) * 3}k+ reads`,
+              level: idx % 2 === 0 ? 'Advanced' : 'Beginner',
+              duration: 'Complete Book Track',
+              url: `https://openlibrary.org${work.key}`,
+              gradient: GRADIENTS['Open Library'],
+              tag: 'Academic Track',
+              hasCertificate: false,
+              highlights: ['Full academic syllabus', 'Foundational concepts', 'Internet Archive edition']
+            });
+          });
+        }
 
         // 2. Parse DEV.to
-        [devCourseRes, devPyRes, devJsRes, devAiRes, devDesignRes].forEach(res => {
-          if (res.status === 'fulfilled' && res.value.ok) {
-            res.value.json().then(articles => {
-              (articles || []).forEach(art => {
-                const { category, subcategory } = classifyText(art.title, art.description, (art.tag_list || []).join(' '));
-                liveCourses.push({
-                  id: `dev-${art.id}`,
-                  title: art.title,
-                  description: art.description || `Practical real-world developer guide on ${subcategory}.`,
-                  category,
-                  subcategory,
-                  provider: 'DEV Com',
-                  isFree: true,
-                  rating: '4.8',
-                  enrolled: `${(art.positive_reactions_count || 20) * 12}+ learners`,
-                  level: 'Intermediate',
-                  duration: `${art.reading_time_minutes ? art.reading_time_minutes * 3 : 15} Hours`,
-                  url: art.url,
-                  gradient: GRADIENTS['DEV Com'],
-                  tag: 'Workshop',
-                  hasCertificate: false,
-                  highlights: ['Hands-on code examples', 'Author discussion & feedback', 'Production patterns']
-                });
-              });
-            }).catch(() => { });
-          }
-        });
+        for (const res of [dev1, dev2, dev3, dev4]) {
+          const articles = await readJson(res);
+          (articles || []).forEach(art => {
+            if (!art.title || !art.url) return;
+            const { category, subcategory } = classifyText(art.title, art.description, (art.tag_list || []).join(' '));
+            liveCourses.push({
+              id: `dev-${art.id}`,
+              title: art.title,
+              description: art.description || `Practical developer guide on ${subcategory}.`,
+              category,
+              subcategory,
+              provider: 'DEV Com',
+              isFree: true,
+              rating: '4.8',
+              enrolled: `${(art.positive_reactions_count || 20) * 12}+ learners`,
+              level: 'Intermediate',
+              duration: `${art.reading_time_minutes ? art.reading_time_minutes * 3 : 15} Hours`,
+              url: art.url,
+              gradient: GRADIENTS['DEV Com'],
+              tag: 'Workshop',
+              hasCertificate: false,
+              highlights: ['Hands-on code examples', 'Author discussion & feedback', 'Production patterns']
+            });
+          });
+        }
 
         // 3. Parse WikiBooks
-        [wikiCsRes, wikiProgRes, wikiLangRes].forEach(res => {
-          if (res.status === 'fulfilled' && res.value.ok) {
-            res.value.json().then(data => {
-              (data?.query?.categorymembers || []).forEach((page, idx) => {
-                const { category, subcategory } = classifyText(page.title, 'textbook curriculum');
-                liveCourses.push({
-                  id: `wiki-${page.pageid || idx}`,
-                  title: page.title,
-                  description: `Open-source textbook and complete syllabus track on ${page.title}.`,
-                  category,
-                  subcategory,
-                  provider: 'WikiBooks',
-                  isFree: true,
-                  rating: '4.7',
-                  enrolled: '50k+ readers',
-                  level: 'Beginner',
-                  duration: 'Self-Paced Track',
-                  url: `https://en.wikibooks.org/wiki/${encodeURIComponent(page.title)}`,
-                  gradient: GRADIENTS['WikiBooks'],
-                  tag: 'Open Textbook',
-                  hasCertificate: false,
-                  highlights: ['Community-vetted syllabus', 'Practice exercises', '100% open-access resource']
-                });
-              });
-            }).catch(() => { });
-          }
-        });
+        for (const res of [wiki1, wiki2, wiki3]) {
+          const data = await readJson(res);
+          (data?.query?.categorymembers || []).forEach((page, idx) => {
+            if (!page.title) return;
+            const { category, subcategory } = classifyText(page.title, 'textbook curriculum');
+            liveCourses.push({
+              id: `wiki-${page.pageid || idx}`,
+              title: page.title,
+              description: `Open-source textbook and complete syllabus track on ${page.title}.`,
+              category,
+              subcategory,
+              provider: 'WikiBooks',
+              isFree: true,
+              rating: '4.7',
+              enrolled: '50k+ readers',
+              level: 'Beginner',
+              duration: 'Self-Paced Track',
+              url: `https://en.wikibooks.org/wiki/${encodeURIComponent(page.title)}`,
+              gradient: GRADIENTS['WikiBooks'],
+              tag: 'Open Textbook',
+              hasCertificate: false,
+              highlights: ['Community-vetted syllabus', 'Practice exercises', '100% open-access resource']
+            });
+          });
+        }
 
-        // 4. Parse Hacker News
-        [hnCourseRes, hnTutorialRes].forEach(res => {
-          if (res.status === 'fulfilled' && res.value.ok) {
-            res.value.json().then(data => {
-              (data.hits || []).filter(h => h.title).forEach(hit => {
-                const { category, subcategory } = classifyText(hit.title, '');
-                liveCourses.push({
-                  id: `hn-${hit.objectID}`,
-                  title: hit.title,
-                  description: `Curated learning guide submitted by @${hit.author || 'engineer'} on Hacker Hub.`,
-                  category,
-                  subcategory,
-                  provider: 'Hacker Hub',
-                  isFree: true,
-                  rating: '4.9',
-                  enrolled: `${hit.points || 150} pts`,
-                  level: 'Intermediate',
-                  duration: 'Self-Paced Track',
-                  url: hit.url && hit.url.startsWith('http') ? hit.url : `https://news.ycombinator.com/item?id=${hit.objectID}`,
-                  gradient: GRADIENTS['Hacker Hub'],
-                  tag: 'Vetted Track',
-                  hasCertificate: false,
-                  highlights: ['Direct link to lecture repos', 'Vetted by engineering community', 'Zero paywalls']
-                });
-              });
-            }).catch(() => { });
-          }
-        });
+        // 4. Parse Hacker Hub
+        for (const res of [hn1, hn2]) {
+          const data = await readJson(res);
+          (data?.hits || []).filter(h => h.title).forEach(hit => {
+            const { category, subcategory } = classifyText(hit.title, '');
+            liveCourses.push({
+              id: `hn-${hit.objectID}`,
+              title: hit.title,
+              description: `Curated learning guide submitted by @${hit.author || 'engineer'} on Hacker Hub.`,
+              category,
+              subcategory,
+              provider: 'Hacker Hub',
+              isFree: true,
+              rating: '4.9',
+              enrolled: `${hit.points || 150} pts`,
+              level: 'Intermediate',
+              duration: 'Self-Paced Track',
+              url: hit.url && hit.url.startsWith('http') ? hit.url : `https://news.ycombinator.com/item?id=${hit.objectID}`,
+              gradient: GRADIENTS['Hacker Hub'],
+              tag: 'Vetted Track',
+              hasCertificate: false,
+              highlights: ['Direct link to lecture repos', 'Vetted by engineering community', 'Zero paywalls']
+            });
+          });
+        }
 
-        // 5. Parse Apple
-        if (appleRes.status === 'fulfilled' && appleRes.value.ok) {
-          const appleData = await appleRes.value.json();
-          (appleData.results || []).forEach((item, idx) => {
+        // 5. Parse Apple Podcasts
+        for (const res of [apple1, apple2, apple3]) {
+          const data = await readJson(res);
+          (data?.results || []).forEach((item, idx) => {
+            if (!item.collectionName || !item.collectionViewUrl) return;
             const { category, subcategory } = classifyText(item.collectionName, '');
             liveCourses.push({
               id: `apple-${item.collectionId || idx}`,
               title: item.collectionName,
-              description: `Open curriculum lecture by ${item.artistName || 'University Faculty'}.`,
+              description: `Open curriculum lecture series by ${item.artistName || 'University Faculty'}.`,
               category,
               subcategory,
               provider: 'Apple',
@@ -538,82 +534,83 @@ const AppContent = () => {
               duration: 'Lecture Series',
               url: item.collectionViewUrl,
               gradient: GRADIENTS['Apple'],
-              tag: 'Official Audio Track',
+              tag: 'Audio Track',
               hasCertificate: false,
               highlights: ['Recorded university lectures', 'Academic syllabus notes', '100% open access']
             });
-
-            // 6. Parse Coursera Live Streams
-            [courseraLiveRes, courseraSpecRes].forEach(res => {
-              if (res.status === 'fulfilled' && res.value.ok) {
-                res.value.json().then(data => {
-                  (data.hits || []).filter(h => h.title).forEach(hit => {
-                    const { category, subcategory } = classifyText(hit.title, '');
-                    liveCourses.push({
-                      id: `coursera-${hit.objectID}`,
-                      title: hit.title.replace(/\[.*?\]|\(.*?\)/g, '').trim(),
-                      description: `University & industry course curriculum on ${subcategory} hosted on Coursera.`,
-                      category,
-                      subcategory,
-                      provider: 'Coursera',
-                      isFree: false,
-                      rating: '4.9',
-                      enrolled: `${hit.points ? hit.points * 15 : 85}k+`,
-                      level: 'Intermediate',
-                      duration: '3 Months',
-                      url: hit.url && hit.url.startsWith('http') ? hit.url : `https://www.coursera.org/search?query=${encodeURIComponent(subcategory)}`,
-                      gradient: GRADIENTS['Coursera'],
-                      tag: 'Specialization',
-                      hasCertificate: true,
-                      highlights: ['University verified curriculum', 'Hands-on applied lab projects', 'Digital certificate included']
-                    });
-                  });
-                }).catch(() => { });
-              }
-            });
-
-            // 7. Parse CodeCamp
-            if (fccOfficialRes.status === 'fulfilled' && fccOfficialRes.value.ok) {
-              fccOfficialRes.value.json().then(articles => {
-                (articles || []).forEach(art => {
-                  const { category, subcategory } = classifyText(art.title, art.description, (art.tag_list || []).join(' '));
-                  liveCourses.push({
-                    id: `fcc-${art.id}`,
-                    title: `${art.title} (CodeCamp Track)`,
-                    description: art.description || `Master ${subcategory} through interactive coding challenges.`,
-                    category,
-                    subcategory,
-                    provider: 'CodeCamp',
-                    isFree: true,
-                    rating: '4.9',
-                    enrolled: `${(art.positive_reactions_count || 30) * 18}+ learners`,
-                    level: 'All Levels',
-                    duration: '300 Hours',
-                    url: art.url,
-                    gradient: GRADIENTS['CodeCamp'],
-                    tag: '100% Free Verified',
-                    hasCertificate: true,
-                    highlights: ['Interactive browser code exercises', 'Mandatory capstone projects', 'Verified certification']
-                  });
-                });
-              }).catch(() => { });
-            }
           });
         }
 
-        // Deduplicate URLs and set state
-        setTimeout(() => {
-          const seen = new Set();
-          const deduped = liveCourses.filter(c => {
-            if (!c.url || seen.has(c.url)) return false;
-            seen.add(c.url);
-            return true;
+        // 6. Parse Coursera Live Streams
+        for (const res of [coursera1, coursera2]) {
+          const data = await readJson(res);
+          (data?.hits || []).filter(h => h.title).forEach(hit => {
+            const { category, subcategory } = classifyText(hit.title, '');
+            liveCourses.push({
+              id: `coursera-${hit.objectID}`,
+              title: hit.title.replace(/\[.*?\]|\(.*?\)/g, '').trim(),
+              description: `University & industry curriculum on ${subcategory} hosted on Coursera.`,
+              category,
+              subcategory,
+              provider: 'Coursera',
+              isFree: false,
+              rating: '4.9',
+              enrolled: `${hit.points ? hit.points * 15 : 85}k+`,
+              level: 'Intermediate',
+              duration: '3 Months',
+              url: hit.url && hit.url.startsWith('http') ? hit.url : `https://www.coursera.org/search?query=${encodeURIComponent(subcategory)}`,
+              gradient: GRADIENTS['Coursera'],
+              tag: 'Specialization',
+              hasCertificate: true,
+              highlights: ['University verified curriculum', 'Hands-on applied lab projects', 'Digital certificate']
+            });
           });
-          if (deduped.length > 0) {
-            setCourses(deduped);
-            setLastSyncTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
-          }
-        }, 500);
+        }
+
+        // 7. Parse CodeCamp
+        for (const res of [fcc1, fcc2]) {
+          const articlesOrHits = await readJson(res);
+          const list = Array.isArray(articlesOrHits) ? articlesOrHits : (articlesOrHits?.hits || []);
+          list.forEach(item => {
+            const title = item.title;
+            const url = item.url || (item.objectID ? `https://news.ycombinator.com/item?id=${item.objectID}` : null);
+            if (!title || !url) return;
+            const { category, subcategory } = classifyText(title, item.description || '', (item.tag_list || []).join(' '));
+            liveCourses.push({
+              id: `fcc-${item.id || item.objectID}`,
+              title: `${title} (CodeCamp Track)`,
+              description: item.description || `Master ${subcategory} through interactive coding challenges.`,
+              category,
+              subcategory,
+              provider: 'CodeCamp',
+              isFree: true,
+              rating: '4.9',
+              enrolled: '120k+ learners',
+              level: 'All Levels',
+              duration: '300 Hours',
+              url: url,
+              gradient: GRADIENTS['CodeCamp'],
+              tag: '100% Free Verified',
+              hasCertificate: true,
+              highlights: ['Interactive browser code editor', 'Mandatory capstone projects', 'Verified certification']
+            });
+          });
+        }
+
+        // Deduplicate & Update State
+        const seen = new Set();
+        const deduped = liveCourses.filter(c => {
+          if (!c.url || seen.has(c.url)) return false;
+          seen.add(c.url);
+          return true;
+        });
+
+        if (deduped.length > 0) {
+          setCourses(deduped);
+          setLastSyncTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+        } else {
+          throw new Error('No live courses parsed');
+        }
 
       } catch (err) {
         setApiError('Unable to connect to live course feeds.');
