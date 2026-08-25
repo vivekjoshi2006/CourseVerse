@@ -7,15 +7,7 @@ import {
   Activity, ArrowDownAZ, ArrowLeftRight, ArrowRight, Banknote, BarChart3, Binary, BookOpen, Bookmark, Bot, Box, Boxes, Brain, Briefcase, Check, ChevronDown, Clock, Cloud, Code2, Coins, Combine, Compass, Component, Cpu, DollarSign, ExternalLink, Eye, Feather, FileCode, FileCode2, Flame, GitMerge, Globe, Globe2, GraduationCap, Heart, Languages, Layers, Layout, LayoutGrid, LineChart, LogOut, MessageCircle, MessageSquare, MessageSquareText, MessagesSquare, Monitor, Network, Palette, PenTool, PieChart, RefreshCw, Rocket, Scale, Scan, Search, Server, ShieldCheck, SlidersHorizontal, Smartphone, Sparkles, Star, Target, Terminal, Timer, TrendingUp, UserCheck, Workflow, X, Zap
 } from 'lucide-react';
 
-// API URL Resolver (Works on Localhost & Vercel)
-const isLocalhost = typeof window !== 'undefined' && (
-  window.location.hostname === 'localhost' || 
-  window.location.hostname === '127.0.0.1'
-);
-
-const API_BASE_URL = process.env.REACT_APP_API_URL !== undefined
-  ? process.env.REACT_APP_API_URL
-  : (isLocalhost ? 'http://localhost:5001' : '');
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 
 // Authentication Provider & Context
 const AuthContext = createContext(null);
@@ -58,9 +50,7 @@ const GRADIENTS = {
   'Hacker Hub': 'linear-gradient(135deg, #ea580c, #fb923c)',
   'Open Library': 'linear-gradient(135deg, #047857, #10b981)',
   'DEV Com': 'linear-gradient(135deg, #be185d, #f43f5e)',
-  'DEV Community': 'linear-gradient(135deg, #be185d, #f43f5e)',
   'Apple': 'linear-gradient(135deg, #b45309, #f59e0b)',
-  'Stanford & Oxford': 'linear-gradient(135deg, #6b21a8, #9333ea)',
   'WikiBooks': 'linear-gradient(135deg, #0e7490, #06b6d4)',
 };
 
@@ -76,7 +66,6 @@ export const CATEGORIES = [
     icon: 'LayoutGrid',
     subcategories: [
       { name: 'All', icon: 'Compass' },
-      
       // Programming
       { name: 'Python', icon: 'Terminal' },
       { name: 'JavaScript & TypeScript', icon: 'FileCode2' },
@@ -85,33 +74,33 @@ export const CATEGORIES = [
       { name: 'Rust & Go', icon: 'Boxes' },
       { name: 'Algorithms & DS', icon: 'GitMerge' },
       { name: 'Full Stack', icon: 'Server' },
-
+      
       // Tech & CS
       { name: 'Web Development', icon: 'Globe' },
       { name: 'Mobile Dev', icon: 'Smartphone' },
       { name: 'DevOps & Cloud', icon: 'Cloud' },
       { name: 'Cybersecurity', icon: 'ShieldCheck' },
       { name: 'System Design', icon: 'Network' },
-
+      
       // AI & Data
       { name: 'Machine Learning', icon: 'Brain' },
       { name: 'Data Science', icon: 'BarChart3' },
       { name: 'LLMs & GenAI', icon: 'Sparkles' },
       { name: 'Deep Learning', icon: 'Activity' },
-      { name: 'Computer Vision', icon: 'Scan' },
-
+      { name: 'Computer Vision', icon: 'Scan' 
+      
       // Design & Creative
       { name: 'UI/UX Design', icon: 'Layout' },
       { name: '3D Animation', icon: 'Box' },
       { name: 'Graphic Design', icon: 'PenTool' },
       { name: 'Figma & Design Systems', icon: 'Component' },
-
+      
       // Business & SaaS
       { name: 'Digital Marketing', icon: 'TrendingUp' },
       { name: 'Product Management', icon: 'Target' },
       { name: 'Startup Growth', icon: 'Rocket' },
       { name: 'Fintech & Sales', icon: 'Banknote' },
-
+      
       // Languages
       { name: 'English', icon: 'MessageSquareText' },
       { name: 'Spanish', icon: 'MessageSquare' },
@@ -206,59 +195,39 @@ export const CATEGORIES = [
 export const classifyText = (title = '', desc = '', tags = '') => {
   const text = `${title} ${desc} ${tags}`.toLowerCase();
 
-  // Languages
-  if (text.includes('spanish') || text.includes('espanol')) return { category: 'languages', subcategory: 'Spanish' };
-  if (text.includes('french') || text.includes('francais')) return { category: 'languages', subcategory: 'French' };
-  if (text.includes('german') || text.includes('deutsch')) return { category: 'languages', subcategory: 'German' };
-  if (text.includes('japanese') || text.includes('nihongo') || text.includes('jlpt')) return { category: 'languages', subcategory: 'Japanese' };
-  if (text.includes('mandarin') || text.includes('chinese') || text.includes('hsk')) return { category: 'languages', subcategory: 'Mandarin' };
-  if (text.includes('english') || text.includes('grammar') || text.includes('communication') || text.includes('language')) return { category: 'languages', subcategory: 'English' };
-
-  // Programming
-  if (
-    text.includes('python') || text.includes('javascript') || text.includes('typescript') ||
-    text.includes('c++') || text.includes('c#') || text.includes('rust') || text.includes('golang') ||
-    text.includes('java') || text.includes('algorithm') || text.includes('full stack') || text.includes('fullstack')
-  ) {
+  if (text.includes('spanish') || text.includes('french') || text.includes('german') || text.includes('japanese') || text.includes('english') || text.includes('language')) {
+    let sub = 'English';
+    if (text.includes('spanish')) sub = 'Spanish';
+    if (text.includes('french')) sub = 'French';
+    if (text.includes('german')) sub = 'German';
+    if (text.includes('japanese')) sub = 'Japanese';
+    return { category: 'languages', subcategory: sub };
+  }
+  if (text.includes('python') || text.includes('javascript') || text.includes('typescript') || text.includes('c++') || text.includes('rust') || text.includes('golang') || text.includes('java') || text.includes('algorithm')) {
     let sub = 'Python';
-    if (text.includes('javascript') || text.includes('typescript') || text.includes('react') || text.includes('node')) sub = 'JavaScript & TypeScript';
-    if (text.includes('c++') || text.includes('c#') || text.includes('c /')) sub = 'C / C++';
-    if (text.includes('rust') || text.includes('go') || text.includes('golang')) sub = 'Rust & Go';
-    if (text.includes('java') || text.includes('spring')) sub = 'Java & Spring';
-    if (text.includes('algorithm') || text.includes('data structure') || text.includes('leetcode')) sub = 'Algorithms & DS';
-    if (text.includes('full stack') || text.includes('fullstack') || text.includes('mern')) sub = 'Full Stack';
+    if (text.includes('javascript') || text.includes('typescript') || text.includes('react')) sub = 'JavaScript & TypeScript';
+    if (text.includes('c++') || text.includes('c#')) sub = 'C / C++';
+    if (text.includes('rust') || text.includes('go')) sub = 'Rust & Go';
+    if (text.includes('java')) sub = 'Java & Spring';
+    if (text.includes('algorithm') || text.includes('data structure')) sub = 'Algorithms & DS';
     return { category: 'programming', subcategory: sub };
   }
-
-  // AI & Data
-  if (text.includes('prompt') || text.includes('llm') || text.includes('gpt') || text.includes('genai') || text.includes('generative ai') || text.includes('langchain')) return { category: 'ai', subcategory: 'LLMs & GenAI' };
-  if (text.includes('computer vision') || text.includes('opencv') || text.includes('yolo')) return { category: 'ai', subcategory: 'Computer Vision' };
-  if (text.includes('deep learning') || text.includes('neural') || text.includes('pytorch')) return { category: 'ai', subcategory: 'Deep Learning' };
-  if (text.includes('data science') || text.includes('analytics') || text.includes('sql') || text.includes('pandas')) return { category: 'ai', subcategory: 'Data Science' };
-  if (text.includes('data') || text.includes('machine learning') || text.includes('ai')) return { category: 'ai', subcategory: 'Machine Learning' };
-
-  // Design & Creative
-  if (text.includes('3d') || text.includes('blender') || text.includes('animation') || text.includes('threejs')) return { category: 'design', subcategory: '3D Animation' };
-  if (text.includes('figma') || text.includes('design system')) return { category: 'design', subcategory: 'Figma & Design Systems' };
-  if (text.includes('graphic') || text.includes('photoshop') || text.includes('typography') || text.includes('illustrator')) return { category: 'design', subcategory: 'Graphic Design' };
-  if (text.includes('ui') || text.includes('ux') || text.includes('user experience') || text.includes('wireframe')) return { category: 'design', subcategory: 'UI/UX Design' };
-
-  // Business & SaaS
-  if (text.includes('startup') || text.includes('entrepreneurship') || text.includes('saas') || text.includes('growth')) return { category: 'business', subcategory: 'Startup Growth' };
-  if (text.includes('marketing') || text.includes('seo') || text.includes('social media') || text.includes('acquisition')) return { category: 'business', subcategory: 'Digital Marketing' };
-  if (text.includes('product management') || text.includes('scrum') || text.includes('agile') || text.includes('roadmap')) return { category: 'business', subcategory: 'Product Management' };
-  if (text.includes('fintech') || text.includes('sales') || text.includes('finance') || text.includes('trading')) return { category: 'business', subcategory: 'Fintech & Sales' };
-
-  // Tech & CS
-  if (text.includes('devops') || text.includes('docker') || text.includes('kubernetes') || text.includes('cloud') || text.includes('aws')) return { category: 'tech', subcategory: 'DevOps & Cloud' };
-  if (text.includes('mobile') || text.includes('android') || text.includes('ios') || text.includes('swift') || text.includes('flutter')) return { category: 'tech', subcategory: 'Mobile Dev' };
-  if (text.includes('security') || text.includes('cyber') || text.includes('hacking') || text.includes('cryptography')) return { category: 'tech', subcategory: 'Cybersecurity' };
-  if (text.includes('system design') || text.includes('architecture') || text.includes('distributed')) return { category: 'tech', subcategory: 'System Design' };
-
+  if (text.includes('data') || text.includes('machine learning') || text.includes('ai') || text.includes('gpt') || text.includes('llm')) {
+    let sub = 'Machine Learning';
+    if (text.includes('data science') || text.includes('analytics')) sub = 'Data Science';
+    if (text.includes('prompt') || text.includes('llm') || text.includes('genai')) sub = 'LLMs & GenAI';
+    return { category: 'ai', subcategory: sub };
+  }
+  if (text.includes('design') || text.includes('ui') || text.includes('ux') || text.includes('css') || text.includes('graphic') || text.includes('figma')) {
+    return { category: 'design', subcategory: 'UI/UX Design' };
+  }
+  if (text.includes('business') || text.includes('marketing') || text.includes('management') || text.includes('startup') || text.includes('saas') || text.includes('growth') || text.includes('product')) {
+    return { category: 'business', subcategory: 'Product Management' };
+  }
   return { category: 'tech', subcategory: 'Web Development' };
 };
 
-// Course Duration Matcher
+// Course Duration
 const matchesDurationFilter = (durationStr = '', filterValue) => {
   if (filterValue === 'all') return true;
   const str = (durationStr || '').toLowerCase();
@@ -279,21 +248,29 @@ const matchesDurationFilter = (durationStr = '', filterValue) => {
   const isWeek = str.includes('week');
   const isHour = str.includes('hour') || str.includes('hr');
 
+  // Convert roughly to weeks equivalent
   let approxWeeks = 0;
   if (isMonth) approxWeeks = num * 4.3;
   else if (isWeek) approxWeeks = num;
   else if (isHour) approxWeeks = num / 10;
   else approxWeeks = 4;
 
+  // < 2 Weeks (Crash Courses)
   if (filterValue === 'under2Weeks') {
     return (isWeek && num <= 2) || (isHour && num <= 20) || (approxWeeks <= 2 && !isMonth && !str.includes('textbook'));
   }
+
+  // 2–4 Weeks (Standard Modules)
   if (filterValue === '2to4Weeks') {
     return (isWeek && num > 2 && num <= 4) || (isHour && num > 20 && num <= 50) || (approxWeeks > 2 && approxWeeks <= 4.5);
   }
+
+  // 1–3 Months (Deep Dives)
   if (filterValue === '1to3Months') {
     return (isMonth && num >= 1 && num <= 3) || (isWeek && num > 4 && num <= 12) || (isHour && num > 50 && num <= 150) || (approxWeeks > 4.5 && approxWeeks <= 12);
   }
+
+  // 3+ Months (Specializations & Professional Certificates)
   if (filterValue === '3PlusMonths') {
     return (isMonth && num > 3) || (isWeek && num > 12) || (isHour && num > 150) || approxWeeks > 12;
   }
@@ -303,7 +280,7 @@ const matchesDurationFilter = (durationStr = '', filterValue) => {
 
 // Parse enrollment count for popularity sorting
 const parseEnrollment = (enrolledStr = '') => {
-  const str = (enrolledStr || '').toString().toLowerCase();
+  const str = enrolledStr.toString().toLowerCase();
   if (str.includes('m')) return (parseFloat(str) || 1) * 1000000;
   if (str.includes('k')) return (parseFloat(str) || 1) * 1000;
   const num = parseFloat(str.replace(/[^0-9.]/g, ''));
@@ -373,241 +350,203 @@ const AppContent = () => {
       }
       throw new Error('Backend empty payload');
     } catch (backendErr) {
-      console.warn('Backend unavailable, running multi-platform direct API stream in browser...');
+      console.warn('Backend offline, pulling live streams directly from public APIs in browser...');
       try {
-        const [olRes, devRes, wikiRes, hnRes] = await Promise.allSettled([
-          fetch('https://openlibrary.org/subjects/computer_science.json?limit=15'),
-          fetch('https://dev.to/api/articles?tag=course&per_page=15'),
-          fetch('https://en.wikibooks.org/w/api.php?action=query&list=categorymembers&cmtitle=Category:Subject:Computer_science&format=json&cmlimit=12&origin=*'),
-          fetch('https://hn.algolia.com/api/v1/search?query=course+tutorial+mit+stanford+cs&tags=story&hitsPerPage=12')
+        // Fetch real live streams in parallel across all subjects with increased limits
+        const [
+          olCsRes, olProgRes, olAiRes, olWebRes,
+          devCourseRes, devPyRes, devJsRes, devAiRes, devDesignRes,
+          wikiCsRes, wikiProgRes, wikiLangRes,
+          hnCourseRes, hnTutorialRes,
+          appleRes
+        ] = await Promise.allSettled([
+          // Open Library Live Subject APIs (200+ real books)
+          fetch('https://openlibrary.org/subjects/computer_science.json?limit=50'),
+          fetch('https://openlibrary.org/subjects/programming.json?limit=50'),
+          fetch('https://openlibrary.org/subjects/artificial_intelligence.json?limit=50'),
+          fetch('https://openlibrary.org/subjects/web_development.json?limit=50'),
+
+          // DEV.to Live Article & Course APIs (150+ real developer tracks)
+          fetch('https://dev.to/api/articles?tag=course&per_page=30'),
+          fetch('https://dev.to/api/articles?tag=python&per_page=30'),
+          fetch('https://dev.to/api/articles?tag=javascript&per_page=30'),
+          fetch('https://dev.to/api/articles?tag=ai&per_page=30'),
+          fetch('https://dev.to/api/articles?tag=design&per_page=30'),
+
+          // WikiBooks Open Curriculum APIs (100+ real textbooks)
+          fetch('https://en.wikibooks.org/w/api.php?action=query&list=categorymembers&cmtitle=Category:Subject:Computer_science&format=json&cmlimit=50&origin=*'),
+          fetch('https://en.wikibooks.org/w/api.php?action=query&list=categorymembers&cmtitle=Category:Subject:Programming&format=json&cmlimit=50&origin=*'),
+          fetch('https://en.wikibooks.org/w/api.php?action=query&list=categorymembers&cmtitle=Category:Subject:Languages&format=json&cmlimit=50&origin=*'),
+
+          // Hacker News Algolia Live APIs (50+ community guides)
+          fetch('https://hn.algolia.com/api/v1/search?query=course+tutorial+mit+stanford&tags=story&hitsPerPage=30'),
+          fetch('https://hn.algolia.com/api/v1/search?query=curriculum+guide+architecture&tags=story&hitsPerPage=30'),
+
+          // Apple / University Podcast Lectures (30+ live audio courses)
+          fetch('https://itunes.apple.com/search?term=computer+science+course&media=podcast&entity=podcast&limit=30')
         ]);
 
-        const fccStream = [
-          {
-            id: 'fcc-responsive-web',
-            title: 'Responsive Web Design Certification',
-            description: 'Learn modern HTML5, CSS Flexbox, CSS Grid, and responsive web design best practices.',
-            category: 'tech',
-            subcategory: 'Web Development',
-            provider: 'CodeCamp',
-            isFree: true,
-            rating: '4.9',
-            enrolled: '450k+',
-            level: 'Beginner',
-            duration: '300 Hours',
-            url: 'https://www.freecodecamp.org/learn/2022/responsive-web-design/',
-            gradient: GRADIENTS['CodeCamp'],
-            tag: '100% Free Verified',
-            hasCertificate: true,
-            highlights: ['HTML5 & Modern CSS', '5 Mandatory web projects', 'Official FreeCodeCamp certificate'],
-          },
-          {
-            id: 'fcc-scientific-python',
-            title: 'Scientific Computing with Python Certification',
-            description: 'Master core Python, algorithms, data structures, and computational problem solving.',
-            category: 'programming',
-            subcategory: 'Python',
-            provider: 'CodeCamp',
-            isFree: true,
-            rating: '4.9',
-            enrolled: '380k+',
-            level: 'Beginner',
-            duration: '300 Hours',
-            url: 'https://www.freecodecamp.org/learn/scientific-computing-with-python/',
-            gradient: GRADIENTS['CodeCamp'],
-            tag: 'Certification',
-            hasCertificate: true,
-            highlights: ['Object-oriented Python', 'Data structures & algorithms', 'Official digital certification'],
-          },
-          {
-            id: 'fcc-js-algo',
-            title: 'JavaScript Algorithms and Data Structures',
-            description: 'Learn JavaScript fundamentals, ES6 syntax, OOP, functional programming, and algorithm scripting.',
-            category: 'programming',
-            subcategory: 'JavaScript & TypeScript',
-            provider: 'CodeCamp',
-            isFree: true,
-            rating: '4.9',
-            enrolled: '420k+',
-            level: 'Intermediate',
-            duration: '300 Hours',
-            url: 'https://www.freecodecamp.org/learn/javascript-algorithms-and-data-structures/',
-            gradient: GRADIENTS['CodeCamp'],
-            tag: 'Core Track',
-            hasCertificate: true,
-            highlights: ['ES6+ Modern syntax', 'Data structures in JS', 'Verified developer certificate'],
+        const liveCourses = [];
+
+        // 1. Parse Open Library
+        [olCsRes, olProgRes, olAiRes, olWebRes].forEach(res => {
+          if (res.status === 'fulfilled' && res.value.ok) {
+            res.value.json().then(data => {
+              (data.works || []).forEach((work, idx) => {
+                const authors = (work.authors || []).map(a => a.name).join(', ') || 'Academic Faculty';
+                const { category, subcategory } = classifyText(work.title, (work.subject || []).join(' '));
+                liveCourses.push({
+                  id: `ol-${work.key.replace(/\//g, '-')}-${idx}`,
+                  title: work.title,
+                  description: `Complete academic syllabus and textbook on ${subcategory} by ${authors}.`,
+                  category,
+                  subcategory,
+                  provider: 'Open Library',
+                  isFree: true,
+                  rating: '4.8',
+                  enrolled: `${(work.edition_count || 1) * 3}k+ reads`,
+                  level: idx % 2 === 0 ? 'Advanced' : 'Beginner',
+                  duration: 'Complete Book Track',
+                  url: `https://openlibrary.org${work.key}`,
+                  gradient: GRADIENTS['Open Library'],
+                  tag: 'Academic Track',
+                  hasCertificate: false,
+                  highlights: ['Full academic syllabus', 'Foundational concepts', 'Internet Archive library edition']
+                });
+              });
+            }).catch(() => {});
           }
-        ];
+        });
 
-        const courseraStream = [
-          {
-            id: 'coursera-ml-spec',
-            title: 'Machine Learning Specialization (DeepLearning.AI)',
-            description: 'Master foundational AI concepts and develop practical machine learning skills with Andrew Ng.',
-            category: 'ai',
-            subcategory: 'Machine Learning',
-            provider: 'Coursera',
-            isFree: false,
-            rating: '4.9',
-            enrolled: '880k+',
-            level: 'Beginner',
-            duration: '3 Months',
-            url: 'https://www.coursera.org/specializations/machine-learning-introduction',
-            gradient: GRADIENTS['Coursera'],
-            tag: 'Specialization',
-            hasCertificate: true,
-            highlights: ['Supervised & Unsupervised Learning', 'Neural networks & decision trees', 'Industry-recognized certificate'],
-          },
-          {
-            id: 'apple-swift-dev',
-            title: 'Develop in Swift Tutorials & iOS Architecture',
-            description: 'Official comprehensive curriculum by Apple Education for building iOS & macOS apps with SwiftUI.',
-            category: 'tech',
-            subcategory: 'Mobile Dev',
-            provider: 'Apple',
-            isFree: true,
-            rating: '4.9',
-            enrolled: '320k+',
-            level: 'Intermediate',
-            duration: '2 Months',
-            url: 'https://developer.apple.com/tutorials/swiftui',
-            gradient: GRADIENTS['Apple'],
-            tag: 'Official Apple Track',
-            hasCertificate: false,
-            highlights: ['SwiftUI state & data flow', 'CoreData & SwiftData', 'App Store ready architecture'],
+        // 2. Parse DEV.to
+        [devCourseRes, devPyRes, devJsRes, devAiRes, devDesignRes].forEach(res => {
+          if (res.status === 'fulfilled' && res.value.ok) {
+            res.value.json().then(articles => {
+              (articles || []).forEach(art => {
+                const { category, subcategory } = classifyText(art.title, art.description, (art.tag_list || []).join(' '));
+                liveCourses.push({
+                  id: `dev-${art.id}`,
+                  title: art.title,
+                  description: art.description || `Practical real-world developer guide on ${subcategory}.`,
+                  category,
+                  subcategory,
+                  provider: 'DEV Com',
+                  isFree: true,
+                  rating: '4.8',
+                  enrolled: `${(art.positive_reactions_count || 20) * 12}+ learners`,
+                  level: 'Intermediate',
+                  duration: `${art.reading_time_minutes ? art.reading_time_minutes * 3 : 15} Hours`,
+                  url: art.url,
+                  gradient: GRADIENTS['DEV Com'],
+                  tag: 'Workshop',
+                  hasCertificate: false,
+                  highlights: ['Hands-on code examples', 'Author discussion & feedback', 'Production patterns']
+                });
+              });
+            }).catch(() => {});
           }
-        ];
+        });
 
-        const olStream = [];
-        const devStream = [];
-        const wikiStream = [];
-        const hnStream = [];
+        // 3. Parse WikiBooks
+        [wikiCsRes, wikiProgRes, wikiLangRes].forEach(res => {
+          if (res.status === 'fulfilled' && res.value.ok) {
+            res.value.json().then(data => {
+              (data?.query?.categorymembers || []).forEach((page, idx) => {
+                const { category, subcategory } = classifyText(page.title, 'textbook curriculum');
+                liveCourses.push({
+                  id: `wiki-${page.pageid || idx}`,
+                  title: page.title,
+                  description: `Open-source textbook and complete syllabus track on ${page.title}.`,
+                  category,
+                  subcategory,
+                  provider: 'WikiBooks',
+                  isFree: true,
+                  rating: '4.7',
+                  enrolled: '50k+ readers',
+                  level: 'Beginner',
+                  duration: 'Self-Paced Track',
+                  url: `https://en.wikibooks.org/wiki/${encodeURIComponent(page.title)}`,
+                  gradient: GRADIENTS['WikiBooks'],
+                  tag: 'Open Textbook',
+                  hasCertificate: false,
+                  highlights: ['Community-vetted syllabus', 'Practice exercises', '100% open-access resource']
+                });
+              });
+            }).catch(() => {});
+          }
+        });
 
-        if (olRes.status === 'fulfilled' && olRes.value.ok) {
-          const olData = await olRes.value.json();
-          (olData.works || []).forEach((work, idx) => {
-            const authors = (work.authors || []).map((a) => a.name).join(', ');
-            const { category, subcategory } = classifyText(work.title, (work.subject || []).join(' '));
-            olStream.push({
-              id: `ol-${work.key.replace(/\//g, '-')}`,
-              title: work.title,
-              description: `Official learning material and curriculum by ${authors || 'Academic Educators'}.`,
+        // 4. Parse Hacker News
+        [hnCourseRes, hnTutorialRes].forEach(res => {
+          if (res.status === 'fulfilled' && res.value.ok) {
+            res.value.json().then(data => {
+              (data.hits || []).filter(h => h.title).forEach(hit => {
+                const { category, subcategory } = classifyText(hit.title, '');
+                liveCourses.push({
+                  id: `hn-${hit.objectID}`,
+                  title: hit.title,
+                  description: `Curated learning guide submitted by @${hit.author || 'engineer'} on Hacker Hub.`,
+                  category,
+                  subcategory,
+                  provider: 'Hacker Hub',
+                  isFree: true,
+                  rating: '4.9',
+                  enrolled: `${hit.points || 150} pts`,
+                  level: 'Intermediate',
+                  duration: 'Self-Paced Track',
+                  url: hit.url && hit.url.startsWith('http') ? hit.url : `https://news.ycombinator.com/item?id=${hit.objectID}`,
+                  gradient: GRADIENTS['Hacker Hub'],
+                  tag: 'Vetted Track',
+                  hasCertificate: false,
+                  highlights: ['Direct link to lecture repos', 'Vetted by engineering community', 'Zero paywalls']
+                });
+              });
+            }).catch(() => {});
+          }
+        });
+
+        // 5. Parse Apple / Podcasts
+        if (appleRes.status === 'fulfilled' && appleRes.value.ok) {
+          const appleData = await appleRes.value.json();
+          (appleData.results || []).forEach((item, idx) => {
+            const { category, subcategory } = classifyText(item.collectionName, '');
+            liveCourses.push({
+              id: `apple-${item.collectionId || idx}`,
+              title: item.collectionName,
+              description: `Open curriculum lecture by ${item.artistName || 'University Faculty'}.`,
               category,
               subcategory,
-              provider: 'Open Library',
-              isFree: true,
-              rating: '4.8',
-              enrolled: `${(work.edition_count || 1) * 3}k+ reads`,
-              level: idx % 2 === 0 ? 'Advanced' : 'Beginner',
-              duration: 'Complete Book Track',
-              url: `https://openlibrary.org${work.key}`,
-              gradient: GRADIENTS['Open Library'],
-              tag: 'Verified Track',
-              hasCertificate: false,
-              highlights: ['Digital academic resource', 'Deep foundations', 'Preserved by Internet Archive'],
-            });
-          });
-        }
-
-        if (devRes.status === 'fulfilled' && devRes.value.ok) {
-          const devData = await devRes.value.json();
-          (devData || []).forEach((art, idx) => {
-            const { category, subcategory } = classifyText(art.title, art.description, (art.tag_list || []).join(' '));
-            devStream.push({
-              id: `dev-${art.id}`,
-              title: art.title,
-              description: art.description || 'Developer course guide and tutorial series.',
-              category,
-              subcategory,
-              provider: 'DEV Com',
-              isFree: true,
-              rating: '4.8',
-              enrolled: `${(art.positive_reactions_count || 40) * 12}+ learners`,
-              level: idx % 2 === 0 ? 'Intermediate' : 'Beginner',
-              duration: `${art.reading_time_minutes ? art.reading_time_minutes * 3 : 15} Hours`,
-              url: art.url,
-              gradient: GRADIENTS['DEV Com'],
-              tag: 'Workshop',
-              hasCertificate: false,
-              highlights: ['Runnable code examples', 'Author discussion & feedback', 'Architectural patterns'],
-            });
-          });
-        }
-
-        if (wikiRes.status === 'fulfilled' && wikiRes.value.ok) {
-          const wikiData = await wikiRes.value.json();
-          (wikiData?.query?.categorymembers || []).forEach((page, idx) => {
-            const { category, subcategory } = classifyText(page.title, 'textbook curriculum');
-            wikiStream.push({
-              id: `wiki-${page.pageid || idx}`,
-              title: page.title,
-              description: `Open-source textbook and complete syllabus track hosted on WikiBooks.`,
-              category,
-              subcategory,
-              provider: 'WikiBooks',
-              isFree: true,
-              rating: '4.7',
-              enrolled: '50k+ readers',
-              level: 'Beginner',
-              duration: 'Self-Paced Track',
-              url: `https://en.wikibooks.org/wiki/${encodeURIComponent(page.title)}`,
-              gradient: GRADIENTS['WikiBooks'],
-              tag: 'Open Curriculum',
-              hasCertificate: false,
-              highlights: ['Comprehensive syllabus', 'Community maintained', '100% Free access'],
-            });
-          });
-        }
-
-        if (hnRes.status === 'fulfilled' && hnRes.value.ok) {
-          const hnData = await hnRes.value.json();
-          (hnData.hits || []).forEach((hit) => {
-            if (!hit.title) return;
-            const liveUrl = hit.url && hit.url.startsWith('http')
-              ? hit.url
-              : `https://news.ycombinator.com/item?id=${hit.objectID}`;
-            const { category, subcategory } = classifyText(hit.title, '');
-            hnStream.push({
-              id: `hn-${hit.objectID}`,
-              title: hit.title,
-              description: `Curated technical learning track submitted by @${hit.author || 'engineer'} on Hacker Hub.`,
-              category,
-              subcategory,
-              provider: 'Hacker Hub',
+              provider: 'Apple',
               isFree: true,
               rating: '4.9',
-              enrolled: `${hit.points || 150} pts`,
+              enrolled: '35k+ scholars',
               level: 'Intermediate',
-              duration: 'Self-Paced Track',
-              url: liveUrl,
-              gradient: GRADIENTS['Hacker Hub'],
-              tag: 'Vetted Track',
+              duration: 'Lecture Series',
+              url: item.collectionViewUrl,
+              gradient: GRADIENTS['Apple'],
+              tag: 'Official Audio Track',
               hasCertificate: false,
-              highlights: ['Direct link to lecture repos & slides', 'Vetted by professional software engineers', 'Zero paywalls'],
+              highlights: ['Recorded university lectures', 'Academic syllabus notes', '100% open access']
             });
           });
         }
 
-        const combined = [];
-        const maxLen = Math.max(fccStream.length, courseraStream.length, olStream.length, devStream.length, wikiStream.length, hnStream.length);
-        for (let i = 0; i < maxLen; i++) {
-          if (fccStream[i]) combined.push(fccStream[i]);
-          if (courseraStream[i]) combined.push(courseraStream[i]);
-          if (olStream[i]) combined.push(olStream[i]);
-          if (devStream[i]) combined.push(devStream[i]);
-          if (wikiStream[i]) combined.push(wikiStream[i]);
-          if (hnStream[i]) combined.push(hnStream[i]);
-        }
+        // Deduplicate URLs and set state
+        setTimeout(() => {
+          const seen = new Set();
+          const deduped = liveCourses.filter(c => {
+            if (!c.url || seen.has(c.url)) return false;
+            seen.add(c.url);
+            return true;
+          });
+          if (deduped.length > 0) {
+            setCourses(deduped);
+            setLastSyncTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+          }
+        }, 500);
 
-        if (combined.length > 0) {
-          setCourses(combined);
-          setLastSyncTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
-        } else {
-          throw new Error('No live courses received');
-        }
       } catch (err) {
-        setCourses([]);
-        setApiError('Unable to connect to course feeds. Please verify your connection.');
+        setApiError('Unable to connect to live course feeds.');
       }
     } finally {
       setIsSyncing(false);
@@ -653,7 +592,7 @@ const AppContent = () => {
         if (levelFilter === 'advanced' && !lvl.includes('advanced') && !lvl.includes('expert') && !lvl.includes('all')) return false;
       }
 
-      // Duration Filter
+      // Separate Duration Filter
       if (!matchesDurationFilter(course.duration, durationFilter)) {
         return false;
       }
@@ -721,7 +660,7 @@ const AppContent = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
-      {/* Navbar */}
+      {/* Navbar - Clean Light Mode */}
       <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-rose-100 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
 
@@ -745,7 +684,7 @@ const AppContent = () => {
           {/* Header Action Buttons */}
           <div className="flex items-center gap-2.5 sm:gap-3">
 
-            {/* Saved Button */}
+            {/* Saved Button (Pink Theme) */}
             <button
               type="button"
               onClick={() => setShowSavedOnly(!showSavedOnly)}
@@ -814,18 +753,23 @@ const AppContent = () => {
 
       {/* Hero Section */}
       <section className="bg-white border-b border-indigo-100 py-14 md:py-18 relative overflow-hidden">
+
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-violet-100/60 via-indigo-50/30 to-transparent pointer-events-none" />
 
         <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
+
+          {/* Top Badge - Increased Size */}
           <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-gradient-to-r from-violet-50 to-indigo-50 border border-violet-200/80 text-violet-900 text-sm sm:text-base font-bold mb-6 shadow-sm shadow-violet-100">
             <Sparkles size={18} className="text-violet-600 animate-pulse" />
             <span>Multi-Platform Public Course Directory</span>
           </div>
 
+          {/* Main Heading */}
           <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight mb-4 text-center bg-gradient-to-r from-violet-600 via-indigo-600 to-pink-500 bg-clip-text text-transparent pb-3 pt-1 leading-[1.3] sm:leading-[1.3]">
             Discover Verified Courses Across Every Tech Track
           </h1>
 
+          {/* Subtitle */}
           <p className="text-base sm:text-lg text-violet-900/80 max-w-2xl mx-auto mb-8 font-semibold leading-relaxed">
             Real-time curriculum indexing across CodeCamp, Coursera, Hacker Hub University Archives, Open Library, Apple OCW, WikiBooks, and DEV Community.
           </p>
@@ -872,7 +816,9 @@ const AppContent = () => {
 
       {/* Controls & Filter Bar */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
+
         <div className="bg-indigo-50/70 backdrop-blur-md p-5 md:p-6 rounded-2xl border border-indigo-100 shadow-lg shadow-indigo-900/5 mb-8 space-y-5">
+
           <div className="flex items-center gap-2.5 overflow-x-auto pb-1 scrollbar-none [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {CATEGORIES.map((cat) => {
               const isActive = selectedCat === cat.id;
@@ -904,6 +850,8 @@ const AppContent = () => {
           {activeCategoryObj?.subcategories && activeCategoryObj.subcategories.length > 0 && (
             <div className="pt-4 border-t border-indigo-200/60">
               <div className="text-[15px] flex items-center gap-3 bg-purple-100/60 p-3 rounded-xl border border-purple-200/50">
+
+                {/* Tracks */}
                 <div className="inline-flex flex-col items-center gap-1.5 bg-violet-900/10 border border-violet-300/60 px-3 py-1 rounded-lg shrink-0">
                   <Layers className="w-4 h-4 text-violet-700" />
                   <span className="text-[15px] font-black tracking-widest text-violet-900 uppercase">
@@ -923,6 +871,7 @@ const AppContent = () => {
                     })
                     .map((subItem) => {
                       const subName = typeof subItem === 'string' ? subItem : subItem.name;
+
                       const isProgramming = activeCategoryObj.name === 'Programming' || activeCategoryObj.id === 'programming';
                       const subIconKey = typeof subItem === 'object' && subItem.icon ? subItem.icon : null;
                       const SubIconComponent = isProgramming && subName !== 'All'
@@ -956,10 +905,13 @@ const AppContent = () => {
         <div className="relative mb-8 w-full z-30">
           <div className="absolute -inset-1.5 bg-gradient-to-r from-sky-200/50 via-purple-200/40 to-pink-200/50 rounded-[2.5rem] blur-2xl opacity-80 pointer-events-none -z-10" />
 
+          {/* Equal Height Grid Container */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch w-full">
-            {/* Left: Controls & 5 Dropdowns */}
+
+            {/* Left: Domain Title, Badge & 5 Dropdowns */}
             <div className="lg:col-span-8 xl:col-span-9 relative bg-white/95 backdrop-blur-2xl p-4 sm:p-5 rounded-3xl border border-indigo-100/80 shadow-[0_12px_40px_rgba(79,70,229,0.06)] flex flex-col justify-between gap-5 h-full transition-all">
 
+              {/* Icon Title And Live Counter Badge */}
               <div className="flex items-center gap-3.5">
                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 via-violet-600 to-purple-500 flex items-center justify-center text-white shrink-0 shadow-md shadow-indigo-500/20">
                   {showSavedOnly ? <Bookmark size={22} className="fill-white/20" /> : <SlidersHorizontal size={22} />}
@@ -976,7 +928,7 @@ const AppContent = () => {
                 </div>
               </div>
 
-              {/* Dropdowns Grid */}
+              {/* Dropdowns Grid: 2 columns on Mobile Flex on Desktop */}
               <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2.5 sm:gap-3 flex-1 justify-center">
 
                 {/* Platform Dropdown */}
@@ -1006,6 +958,7 @@ const AppContent = () => {
                     />
                   </button>
 
+                  {/* Platform Popover Menu */}
                   {openDropdown === 'platform' && (
                     <div className="absolute left-0 top-full mt-2 w-56 max-w-[85vw] bg-white backdrop-blur-2xl p-2 rounded-2xl border border-sky-100 shadow-2xl shadow-sky-500/20 z-50 animate-in fade-in zoom-in-95 duration-150">
                       <div className="px-2 py-1.5 text-[13px] font-bold text-sky-600 uppercase tracking-wider">Select Source</div>
@@ -1069,6 +1022,7 @@ const AppContent = () => {
                     />
                   </button>
 
+                  {/* Level Popover Menu */}
                   {openDropdown === 'level' && (
                     <div className="absolute left-0 top-full mt-2 w-56 max-w-[85vw] bg-white backdrop-blur-2xl p-2 rounded-2xl border border-purple-100 shadow-2xl shadow-purple-500/20 z-50 animate-in fade-in zoom-in-95 duration-150">
                       <div className="px-2 py-1.5 text-[13px] font-bold text-purple-600 uppercase tracking-wider">Difficulty Level</div>
@@ -1129,6 +1083,7 @@ const AppContent = () => {
                     />
                   </button>
 
+                  {/* Duration Popover Menu */}
                   {openDropdown === 'duration' && (
                     <div className="absolute left-0 top-full mt-2 w-64 max-w-[85vw] bg-white backdrop-blur-2xl p-2 rounded-2xl border border-emerald-100 shadow-2xl shadow-emerald-500/20 z-50 animate-in fade-in zoom-in-95 duration-150">
                       <div className="px-2 py-1.5 text-[13px] font-bold text-emerald-600 uppercase tracking-wider">Estimated Time</div>
@@ -1191,6 +1146,7 @@ const AppContent = () => {
                     />
                   </button>
 
+                  {/* Language Popover Menu */}
                   {openDropdown === 'language' && (
                     <div className="absolute right-0 sm:left-0 top-full mt-2 w-52 max-w-[85vw] bg-white backdrop-blur-2xl p-2 rounded-2xl border border-rose-100 shadow-2xl shadow-rose-500/20 z-50 animate-in fade-in zoom-in-95 duration-150">
                       <div className="px-2 py-1.5 text-[13px] font-bold text-rose-600 uppercase tracking-wider">Select Language</div>
@@ -1241,7 +1197,7 @@ const AppContent = () => {
                       <div className="text-left min-w-0 truncate">
                         <p className="text-[11px] sm:text-[13px] font-bold uppercase tracking-wider text-amber-600">Sort By</p>
                         <p className="text-[12px] sm:text-[13px] font-extrabold truncate">
-                          {sortBy === 'featured' ? 'Featured' : sortBy === 'popular' ? 'Most Popular' : sortBy === 'rating' ? 'Highest Rated' : 'Alphabetical'}
+                          {sortBy === 'featured' ? 'Featured First' : sortBy === 'popular' ? 'Most Popular' : sortBy === 'rating' ? 'Highest Rated' : 'Alphabetical'}
                         </p>
                       </div>
                     </div>
@@ -1251,6 +1207,7 @@ const AppContent = () => {
                     />
                   </button>
 
+                  {/* Sort Popover Menu */}
                   {openDropdown === 'sort' && (
                     <div className="absolute left-0 top-full mt-2 w-52 max-w-[85vw] bg-white backdrop-blur-2xl p-2 rounded-2xl border border-amber-100 shadow-2xl shadow-amber-500/20 z-50 animate-in fade-in zoom-in-95 duration-150">
                       <div className="px-2 py-1.5 text-[13px] font-bold text-amber-600 uppercase tracking-wider">Sort Order</div>
@@ -1339,7 +1296,7 @@ const AppContent = () => {
           </div>
         </div>
 
-        {/* Course Cards Feed */}
+        {/* Course Cards */}
         {isSyncing ? (
           <div className="bg-white border border-zinc-200 rounded-2xl p-16 text-center shadow-sm">
             <div className="inline-block w-8 h-8 border-3 border-zinc-900 border-t-transparent rounded-full animate-spin mb-4" />
@@ -1385,7 +1342,7 @@ const AppContent = () => {
             className="bg-white rounded-3xl max-w-5xl w-full p-6 shadow-2xl border border-pink-100 my-8"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Modal Header */}
+            {/* Modal Header - Violet Theme */}
             <div className="flex items-center justify-between pb-4 border-b border-violet-100 mb-6">
               <div>
                 <h3 className="text-xl font-extrabold text-slate-900 flex items-center gap-2">
@@ -1474,7 +1431,7 @@ const AppContent = () => {
         </div>
       )}
 
-      {/* Auth Modal */}
+      {/* Auth */}
       <LoginForm
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
