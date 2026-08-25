@@ -87,7 +87,7 @@ export const CATEGORIES = [
       { name: 'Data Science', icon: 'BarChart3' },
       { name: 'LLMs & GenAI', icon: 'Sparkles' },
       { name: 'Deep Learning', icon: 'Activity' },
-      { name: 'Computer Vision', icon: 'Scan' 
+      { name: 'Computer Vision', icon: 'Scan' },
       
       // Design & Creative
       { name: 'UI/UX Design', icon: 'Layout' },
