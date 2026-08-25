@@ -365,13 +365,16 @@ const AppContent = () => {
           fetch('https://dev.to/api/articles?tag=ai&per_page=30'),
 
           // WikiBooks
-          fetch('https://en.wikibooks.org/w/api.php?action=query&list=categorymembers&cmtitle=Category:Subject:Computer_science&format=json&cmlimit=50&origin=*'),
-          fetch('https://en.wikibooks.org/w/api.php?action=query&list=categorymembers&cmtitle=Category:Subject:Programming&format=json&cmlimit=50&origin=*'),
-          fetch('https://en.wikibooks.org/w/api.php?action=query&list=categorymembers&cmtitle=Category:Subject:Languages&format=json&cmlimit=50&origin=*'),
+          fetch('https://en.wikibooks.org/w/api.php?action=query&list=categorymembers&cmtitle=Category:Subject:Computer_science&format=json&cmlimit=100&origin=*'),
+          fetch('https://en.wikibooks.org/w/api.php?action=query&list=categorymembers&cmtitle=Category:Subject:Programming&format=json&cmlimit=100&origin=*'),
+          fetch('https://en.wikibooks.org/w/api.php?action=query&list=categorymembers&cmtitle=Category:Subject:Languages&format=json&cmlimit=100&origin=*'),
+          fetch('https://en.wikibooks.org/w/api.php?action=query&list=categorymembers&cmtitle=Category:Subject:Web_development&format=json&cmlimit=100&origin=*'),
+          fetch('https://en.wikibooks.org/w/api.php?action=query&list=categorymembers&cmtitle=Category:Subject:Artificial_intelligence&format=json&cmlimit=100&origin=*'),
 
           // Hacker Hub
-          fetch('https://hn.algolia.com/api/v1/search?query=course&tags=story&hitsPerPage=50'),
-          fetch('https://hn.algolia.com/api/v1/search?query=tutorial&tags=story&hitsPerPage=50'),
+           fetch('https://hn.algolia.com/api/v1/search?query=course&tags=story&hitsPerPage=100'),
+          fetch('https://hn.algolia.com/api/v1/search?query=tutorial&tags=story&hitsPerPage=100'),
+          fetch('https://hn.algolia.com/api/v1/search?query=curriculum&tags=story&hitsPerPage=100'),
 
           // Apple Podcasts
           fetch('https://itunes.apple.com/search?term=programming+course&media=podcast&limit=40'),
@@ -379,8 +382,10 @@ const AppContent = () => {
           fetch('https://itunes.apple.com/search?term=machine+learning+podcast&media=podcast&limit=40'),
 
           // Coursera Live Streams
-          fetch('https://hn.algolia.com/api/v1/search?query=coursera+course&tags=story&hitsPerPage=50'),
-          fetch('https://hn.algolia.com/api/v1/search?query=coursera+specialization&tags=story&hitsPerPage=50'),
+           fetch('https://hn.algolia.com/api/v1/search?query=coursera+course&tags=story&hitsPerPage=100'),
+          fetch('https://hn.algolia.com/api/v1/search?query=coursera+specialization&tags=story&hitsPerPage=100'),
+          fetch('https://hn.algolia.com/api/v1/search?query=coursera+certificate&tags=story&hitsPerPage=100'),
+          fetch('https://dev.to/api/articles?tag=coursera&per_page=50'),
 
           // CodeCamp Live Streams
           fetch('https://dev.to/api/articles?tag=freecodecamp&per_page=50'),
@@ -392,10 +397,10 @@ const AppContent = () => {
         const [
           ol1, ol2, ol3,
           dev1, dev2, dev3, dev4,
-          wiki1, wiki2, wiki3,
-          hn1, hn2,
+          wiki1, wiki2, wiki3, wiki4, wiki5,
+          hn1, hn2, hn3,
           apple1, apple2, apple3,
-          coursera1, coursera2,
+          coursera1, coursera2, coursera3, coursera4,
           fcc1, fcc2, fcc3, fcc4
         ] = results;
 
@@ -464,7 +469,7 @@ const AppContent = () => {
         }
 
         // 3. Parse WikiBooks
-        for (const res of [wiki1, wiki2, wiki3]) {
+        for (const res of [wiki1, wiki2, wiki3, wiki4, wiki5]) {
           const data = await readJson(res);
           (data?.query?.categorymembers || []).forEach((page, idx) => {
             if (!page.title) return;
@@ -491,7 +496,7 @@ const AppContent = () => {
         }
 
         // 4. Parse Hacker Hub
-        for (const res of [hn1, hn2]) {
+         for (const res of [hn1, hn2, hn3]) {
           const data = await readJson(res);
           (data?.hits || []).filter(h => h.title).forEach(hit => {
             const { category, subcategory } = classifyText(hit.title, '');
@@ -544,14 +549,15 @@ const AppContent = () => {
         }
 
         // 6. Parse Coursera Live Streams
-        for (const res of [coursera1, coursera2]) {
+         for (const res of [coursera1, coursera2, coursera3, coursera4]) {
           const data = await readJson(res);
-          (data?.hits || []).filter(h => h.title).forEach(hit => {
-            const { category, subcategory } = classifyText(hit.title, '');
+          const list = Array.isArray(data) ? data : (data?.hits || []);
+          list.filter(h => h.title).forEach(hit => {
+            const { category, subcategory } = classifyText(hit.title, hit.description || '');
             liveCourses.push({
-              id: `coursera-${hit.objectID}`,
+              id: `coursera-${hit.objectID || hit.id}`,
               title: hit.title.replace(/\[.*?\]|\(.*?\)/g, '').trim(),
-              description: `University & industry curriculum on ${subcategory} hosted on Coursera.`,
+              description: hit.description || `University & industry curriculum on ${subcategory} hosted on Coursera.`,
               category,
               subcategory,
               provider: 'Coursera',
