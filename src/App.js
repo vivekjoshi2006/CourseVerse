@@ -1,13 +1,20 @@
-import React, { useState, useEffect, useMemo, createContext, useContext, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useMemo, createContext, useContext, useCallback } from 'react';
 import './App.css';
 import LessonList from './components/LessonList';
 import LoginForm from './components/LoginForm';
 
 import {
-  Activity, ArrowDownAZ, ArrowLeftRight, ArrowRight, Banknote, BarChart3, Binary, BookOpen, Bookmark, Bot, Box, Boxes, Brain, Briefcase, Check, ChevronDown, Clock, Cloud, Code2, Coins, Combine, Compass, Component, Cpu, DollarSign, ExternalLink, Eye, Feather, FileCode, FileCode2, Flame, GitMerge, Globe, Globe2, GraduationCap, Heart, Languages, Layers, Layout, LayoutGrid, LineChart, LogOut, MessageCircle, MessageSquare, MessageSquareText, MessagesSquare, Monitor, Network, Palette, PenTool, PieChart, RefreshCw, Rocket, Scale, Scan, Search, Server, ShieldCheck, SlidersHorizontal, Smartphone, Sparkles, Star, Target, Terminal, Timer, TrendingUp, UserCheck, Workflow, X, Zap
+  Activity, ArrowDownAZ, ArrowLeftRight, ArrowRight, Banknote, BarChart3, Binary, BookOpen, Bookmark, Bot, Box, Boxes, Brain, Briefcase, Check, ChevronDown, Clock, Cloud, Code2, Coins, Combine, Compass, Component, Cpu, DollarSign, ExternalLink, Eye, Feather, FileCode, FileCode2, Flame, GitMerge, Globe, Globe2, GraduationCap, Heart, Languages, Layers, Layout, LayoutGrid, LineChart, LogOut, MessageCircle, MessageSquare, MessageSquareText, MessagesSquare, Monitor, Network, Palette, PenTool, PieChart, RefreshCw, Rocket, Scan, Search, Server, ShieldCheck, SlidersHorizontal, Smartphone, Sparkles, Star, Target, Terminal, Timer, TrendingUp, UserCheck, Workflow, X, Zap
 } from 'lucide-react';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+const isLocalhost = typeof window !== 'undefined' && (
+  window.location.hostname === 'localhost' || 
+  window.location.hostname === '127.0.0.1'
+);
+
+const API_BASE_URL = process.env.REACT_APP_API_URL !== undefined
+  ? process.env.REACT_APP_API_URL
+  : (isLocalhost ? 'http://localhost:5001' : '');
 
 // Authentication Provider & Context
 const AuthContext = createContext(null);
@@ -364,7 +371,7 @@ const AppContent = () => {
           fetch('https://dev.to/api/articles?tag=javascript&per_page=30'),
           fetch('https://dev.to/api/articles?tag=ai&per_page=30'),
 
-          // WikiBooks
+          // WikiBooks (5 subjects, limit=100)
           fetch('https://en.wikibooks.org/w/api.php?action=query&list=categorymembers&cmtitle=Category:Subject:Computer_science&format=json&cmlimit=100&origin=*'),
           fetch('https://en.wikibooks.org/w/api.php?action=query&list=categorymembers&cmtitle=Category:Subject:Programming&format=json&cmlimit=100&origin=*'),
           fetch('https://en.wikibooks.org/w/api.php?action=query&list=categorymembers&cmtitle=Category:Subject:Languages&format=json&cmlimit=100&origin=*'),
@@ -372,7 +379,7 @@ const AppContent = () => {
           fetch('https://en.wikibooks.org/w/api.php?action=query&list=categorymembers&cmtitle=Category:Subject:Artificial_intelligence&format=json&cmlimit=100&origin=*'),
 
           // Hacker Hub
-           fetch('https://hn.algolia.com/api/v1/search?query=course&tags=story&hitsPerPage=100'),
+          fetch('https://hn.algolia.com/api/v1/search?query=course&tags=story&hitsPerPage=100'),
           fetch('https://hn.algolia.com/api/v1/search?query=tutorial&tags=story&hitsPerPage=100'),
           fetch('https://hn.algolia.com/api/v1/search?query=curriculum&tags=story&hitsPerPage=100'),
 
@@ -382,7 +389,7 @@ const AppContent = () => {
           fetch('https://itunes.apple.com/search?term=machine+learning+podcast&media=podcast&limit=40'),
 
           // Coursera Live Streams
-           fetch('https://hn.algolia.com/api/v1/search?query=coursera+course&tags=story&hitsPerPage=100'),
+          fetch('https://hn.algolia.com/api/v1/search?query=coursera+course&tags=story&hitsPerPage=100'),
           fetch('https://hn.algolia.com/api/v1/search?query=coursera+specialization&tags=story&hitsPerPage=100'),
           fetch('https://hn.algolia.com/api/v1/search?query=coursera+certificate&tags=story&hitsPerPage=100'),
           fetch('https://dev.to/api/articles?tag=coursera&per_page=50'),
@@ -496,7 +503,7 @@ const AppContent = () => {
         }
 
         // 4. Parse Hacker Hub
-         for (const res of [hn1, hn2, hn3]) {
+        for (const res of [hn1, hn2, hn3]) {
           const data = await readJson(res);
           (data?.hits || []).filter(h => h.title).forEach(hit => {
             const { category, subcategory } = classifyText(hit.title, '');
@@ -549,7 +556,7 @@ const AppContent = () => {
         }
 
         // 6. Parse Coursera Live Streams
-         for (const res of [coursera1, coursera2, coursera3, coursera4]) {
+        for (const res of [coursera1, coursera2, coursera3, coursera4]) {
           const data = await readJson(res);
           const list = Array.isArray(data) ? data : (data?.hits || []);
           list.filter(h => h.title).forEach(hit => {
@@ -836,7 +843,7 @@ const AppContent = () => {
 
         <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
 
-          {/* Top Badge - Increased Size */}
+          {/* Top Badge */}
           <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-gradient-to-r from-violet-50 to-indigo-50 border border-violet-200/80 text-violet-900 text-sm sm:text-base font-bold mb-6 shadow-sm shadow-violet-100">
             <Sparkles size={18} className="text-violet-600 animate-pulse" />
             <span>Multi-Platform Public Course Directory</span>
@@ -1006,321 +1013,328 @@ const AppContent = () => {
                 </div>
               </div>
 
-              {/* Dropdowns Grid: 2 columns on Mobile Flex on Desktop */}
-              <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2.5 sm:gap-3 flex-1 justify-center">
+              {/* Dropdowns Container: Stack of 3 on Top, 2 on Bottom */}
+              <div className="flex flex-col gap-3 flex-1 justify-center w-full">
 
-                {/* Platform Dropdown */}
-                <div className="relative col-span-1 sm:flex-1 min-w-0" data-dropdown>
-                  <button
-                    type="button"
-                    onClick={() => setOpenDropdown(openDropdown === 'platform' ? null : 'platform')}
-                    className={`w-full flex items-center justify-between gap-1.5 px-3 py-2.5 sm:px-3.5 sm:py-2.5 rounded-2xl border transition-all duration-200 ${openDropdown === 'platform' || platformFilter !== 'all'
-                      ? 'bg-sky-100/90 border-sky-300 text-sky-950 shadow-md shadow-sky-500/10'
-                      : 'bg-sky-50/70 hover:bg-sky-100/60 border-sky-200/70 text-sky-900'
-                      }`}
-                  >
-                    <div className="flex items-center gap-1.5 min-w-0 truncate">
-                      <div className="w-6 h-6 rounded-lg bg-sky-200/80 flex items-center justify-center text-sky-700 shrink-0">
-                        <Globe2 size={14} />
-                      </div>
-                      <div className="text-left min-w-0 truncate">
-                        <p className="text-[11px] sm:text-[13px] font-bold uppercase text-sky-600">Platform</p>
-                        <p className="text-[12px] sm:text-[13px] font-extrabold capitalize truncate">
-                          {platformFilter === 'all' ? 'All Sources' : platformFilter}
-                        </p>
-                      </div>
-                    </div>
-                    <ChevronDown
-                      size={14}
-                      className={`text-sky-600 shrink-0 transition-transform duration-200 ${openDropdown === 'platform' ? 'rotate-180' : ''}`}
-                    />
-                  </button>
+                {/* Top Row: 3 Dropdowns (Platform, Level, Duration) */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 w-full items-stretch">
 
-                  {/* Platform Popover Menu */}
-                  {openDropdown === 'platform' && (
-                    <div className="absolute left-0 top-full mt-2 w-56 max-w-[85vw] bg-white backdrop-blur-2xl p-2 rounded-2xl border border-sky-100 shadow-2xl shadow-sky-500/20 z-50 animate-in fade-in zoom-in-95 duration-150">
-                      <div className="px-2 py-1.5 text-[13px] font-bold text-sky-600 uppercase tracking-wider">Select Source</div>
-                      <button
-                        type="button"
-                        onClick={() => { setPlatformFilter('all'); setOpenDropdown(null); }}
-                        className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-[13px] font-bold transition-all ${platformFilter === 'all'
-                          ? 'bg-sky-500 text-white shadow-sm shadow-sky-500/30'
-                          : 'text-sky-950 hover:bg-sky-50'
-                          }`}
-                      >
-                        <span>All Sources</span>
-                        <span className={`text-[13px] px-1.5 py-0.5 rounded-full ${platformFilter === 'all' ? 'bg-white/20 text-white' : 'bg-sky-100 text-sky-700'}`}>
-                          {platformCounts.all || 0}
-                        </span>
-                      </button>
-                      {availablePlatforms.filter(p => p !== 'all').map(prov => (
+                  {/* Platform Dropdown */}
+                  <div className="relative w-full" data-dropdown>
+                    <button
+                      type="button"
+                      onClick={() => setOpenDropdown(openDropdown === 'platform' ? null : 'platform')}
+                      className={`w-full h-full flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-2xl border transition-all duration-200 ${openDropdown === 'platform' || platformFilter !== 'all'
+                        ? 'bg-sky-100/90 border-sky-300 text-sky-950 shadow-md shadow-sky-500/10'
+                        : 'bg-sky-50/70 hover:bg-sky-100/60 border-sky-200/70 text-sky-900'
+                        }`}
+                    >
+                      <div className="flex items-center gap-2 min-w-0 truncate">
+                        <div className="w-6 h-6 rounded-lg bg-sky-200/80 flex items-center justify-center text-sky-700 shrink-0">
+                          <Globe2 size={14} />
+                        </div>
+                        <div className="text-left min-w-0 truncate">
+                          <p className="text-[12px] font-bold uppercase text-sky-600">Platform</p>
+                          <p className="text-[14px] font-extrabold capitalize truncate">
+                            {platformFilter === 'all' ? 'All Sources' : platformFilter}
+                          </p>
+                        </div>
+                      </div>
+                      <ChevronDown
+                        size={15}
+                        className={`text-sky-600 shrink-0 transition-transform duration-200 ${openDropdown === 'platform' ? 'rotate-180' : ''}`}
+                      />
+                    </button>
+
+                    {/* Platform Popover Menu */}
+                    {openDropdown === 'platform' && (
+                      <div className="absolute left-0 top-full mt-2 w-56 max-w-[85vw] bg-white backdrop-blur-2xl p-2 rounded-2xl border border-sky-100 shadow-2xl shadow-sky-500/20 z-50 animate-in fade-in zoom-in-95 duration-150">
+                        <div className="px-2 py-1.5 text-[12px] font-bold text-sky-600 uppercase tracking-wider">Select Source</div>
                         <button
-                          key={prov}
                           type="button"
-                          onClick={() => { setPlatformFilter(prov); setOpenDropdown(null); }}
-                          className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-[13px] font-bold transition-all mt-1 ${platformFilter === prov
+                          onClick={() => { setPlatformFilter('all'); setOpenDropdown(null); }}
+                          className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-[14px] font-bold transition-all ${platformFilter === 'all'
                             ? 'bg-sky-500 text-white shadow-sm shadow-sky-500/30'
                             : 'text-sky-950 hover:bg-sky-50'
                             }`}
                         >
-                          <span className="capitalize">{prov}</span>
-                          <span className={`text-[13px] px-1.5 py-0.5 rounded-full ${platformFilter === prov ? 'bg-white/20 text-white' : 'bg-sky-100 text-sky-700'}`}>
-                            {platformCounts[prov] || 0}
+                          <span>All Sources</span>
+                          <span className={`text-[13px] px-1.5 py-0.5 rounded-full ${platformFilter === 'all' ? 'bg-white/20 text-white' : 'bg-sky-100 text-sky-700'}`}>
+                            {platformCounts.all || 0}
                           </span>
                         </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* Level Dropdown */}
-                <div className="relative col-span-1 sm:flex-1 min-w-0" data-dropdown>
-                  <button
-                    type="button"
-                    onClick={() => setOpenDropdown(openDropdown === 'level' ? null : 'level')}
-                    className={`w-full flex items-center justify-between gap-1.5 px-3 py-2.5 sm:px-3.5 sm:py-2.5 rounded-2xl border transition-all duration-200 ${openDropdown === 'level' || levelFilter !== 'all'
-                      ? 'bg-purple-100/90 border-purple-300 text-purple-950 shadow-md shadow-purple-500/10'
-                      : 'bg-purple-50/70 hover:bg-purple-100/60 border-purple-200/70 text-purple-900'
-                      }`}
-                  >
-                    <div className="flex items-center gap-1.5 min-w-0 truncate">
-                      <div className="w-6 h-6 rounded-lg bg-purple-200/80 flex items-center justify-center text-purple-700 shrink-0">
-                        <BarChart3 size={14} />
-                      </div>
-                      <div className="text-left min-w-0 truncate">
-                        <p className="text-[11px] sm:text-[13px] font-bold uppercase tracking-wider text-purple-600">Level</p>
-                        <p className="text-[12px] sm:text-[13px] font-extrabold truncate">
-                          {levelFilter === 'all' ? 'All Levels' : levelFilter === 'beginner' ? 'Beginner' : levelFilter === 'intermediate' ? 'Intermediate' : 'Advanced'}
-                        </p>
-                      </div>
-                    </div>
-                    <ChevronDown
-                      size={14}
-                      className={`text-purple-600 shrink-0 transition-transform duration-200 ${openDropdown === 'level' ? 'rotate-180' : ''}`}
-                    />
-                  </button>
-
-                  {/* Level Popover Menu */}
-                  {openDropdown === 'level' && (
-                    <div className="absolute left-0 top-full mt-2 w-56 max-w-[85vw] bg-white backdrop-blur-2xl p-2 rounded-2xl border border-purple-100 shadow-2xl shadow-purple-500/20 z-50 animate-in fade-in zoom-in-95 duration-150">
-                      <div className="px-2 py-1.5 text-[13px] font-bold text-purple-600 uppercase tracking-wider">Difficulty Level</div>
-                      {[
-                        { value: 'all', label: 'All Levels', icon: GraduationCap },
-                        { value: 'beginner', label: 'Beginner Friendly', icon: BookOpen },
-                        { value: 'intermediate', label: 'Intermediate', icon: Zap },
-                        { value: 'advanced', label: 'Mastery / Advanced', icon: Sparkles }
-                      ].map(opt => {
-                        const Icon = opt.icon;
-                        const isSelected = levelFilter === opt.value;
-                        return (
+                        {availablePlatforms.filter(p => p !== 'all').map(prov => (
                           <button
-                            key={opt.value}
+                            key={prov}
                             type="button"
-                            onClick={() => { setLevelFilter(opt.value); setOpenDropdown(null); }}
-                            className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-[13px] font-bold transition-all mt-1 ${isSelected
-                              ? 'bg-purple-600 text-white shadow-sm shadow-purple-500/30'
-                              : 'text-purple-950 hover:bg-purple-50'
+                            onClick={() => { setPlatformFilter(prov); setOpenDropdown(null); }}
+                            className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-[14px] font-bold transition-all mt-1 ${platformFilter === prov
+                              ? 'bg-sky-500 text-white shadow-sm shadow-sky-500/30'
+                              : 'text-sky-950 hover:bg-sky-50'
                               }`}
                           >
-                            <div className="flex items-center gap-2">
-                              <Icon size={14} className={isSelected ? 'text-white' : 'text-purple-500'} />
-                              <span>{opt.label}</span>
-                            </div>
-                            {isSelected && <Check size={14} className="stroke-[3]" />}
+                            <span className="capitalize">{prov}</span>
+                            <span className={`text-[13px] px-1.5 py-0.5 rounded-full ${platformFilter === prov ? 'bg-white/20 text-white' : 'bg-sky-100 text-sky-700'}`}>
+                              {platformCounts[prov] || 0}
+                            </span>
                           </button>
-                        );
-                      })}
-                    </div>
-                  )}
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Level Dropdown */}
+                  <div className="relative w-full" data-dropdown>
+                    <button
+                      type="button"
+                      onClick={() => setOpenDropdown(openDropdown === 'level' ? null : 'level')}
+                      className={`w-full h-full flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-2xl border transition-all duration-200 ${openDropdown === 'level' || levelFilter !== 'all'
+                        ? 'bg-purple-100/90 border-purple-300 text-purple-950 shadow-md shadow-purple-500/10'
+                        : 'bg-purple-50/70 hover:bg-purple-100/60 border-purple-200/70 text-purple-900'
+                        }`}
+                    >
+                      <div className="flex items-center gap-2 min-w-0 truncate">
+                        <div className="w-6 h-6 rounded-lg bg-purple-200/80 flex items-center justify-center text-purple-700 shrink-0">
+                          <BarChart3 size={14} />
+                        </div>
+                        <div className="text-left min-w-0 truncate">
+                          <p className="text-[12px] font-bold uppercase tracking-wider text-purple-600">Level</p>
+                          <p className="text-[14px] font-extrabold truncate">
+                            {levelFilter === 'all' ? 'All Levels' : levelFilter === 'beginner' ? 'Beginner' : levelFilter === 'intermediate' ? 'Intermediate' : 'Advanced'}
+                          </p>
+                        </div>
+                      </div>
+                      <ChevronDown
+                        size={15}
+                        className={`text-purple-600 shrink-0 transition-transform duration-200 ${openDropdown === 'level' ? 'rotate-180' : ''}`}
+                      />
+                    </button>
+
+                    {/* Level Popover Menu */}
+                    {openDropdown === 'level' && (
+                      <div className="absolute left-0 top-full mt-2 w-56 max-w-[85vw] bg-white backdrop-blur-2xl p-2 rounded-2xl border border-purple-100 shadow-2xl shadow-purple-500/20 z-50 animate-in fade-in zoom-in-95 duration-150">
+                        <div className="px-2 py-1.5 text-[12px] font-bold text-purple-600 uppercase tracking-wider">Difficulty Level</div>
+                        {[
+                          { value: 'all', label: 'All Levels', icon: GraduationCap },
+                          { value: 'beginner', label: 'Beginner Friendly', icon: BookOpen },
+                          { value: 'intermediate', label: 'Intermediate', icon: Zap },
+                          { value: 'advanced', label: 'Mastery / Advanced', icon: Sparkles }
+                        ].map(opt => {
+                          const Icon = opt.icon;
+                          const isSelected = levelFilter === opt.value;
+                          return (
+                            <button
+                              key={opt.value}
+                              type="button"
+                              onClick={() => { setLevelFilter(opt.value); setOpenDropdown(null); }}
+                              className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-[14px] font-bold transition-all mt-1 ${isSelected
+                                ? 'bg-purple-600 text-white shadow-sm shadow-purple-500/30'
+                                : 'text-purple-950 hover:bg-purple-50'
+                                }`}
+                            >
+                              <div className="flex items-center gap-2">
+                                <Icon size={14} className={isSelected ? 'text-white' : 'text-purple-500'} />
+                                <span>{opt.label}</span>
+                              </div>
+                              {isSelected && <Check size={14} className="stroke-[3]" />}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Duration Dropdown */}
+                  <div className="relative w-full" data-dropdown>
+                    <button
+                      type="button"
+                      onClick={() => setOpenDropdown(openDropdown === 'duration' ? null : 'duration')}
+                      className={`w-full h-full flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-2xl border transition-all duration-200 ${openDropdown === 'duration' || durationFilter !== 'all'
+                        ? 'bg-emerald-100/90 border-emerald-300 text-emerald-950 shadow-md shadow-emerald-500/10'
+                        : 'bg-emerald-50/70 hover:bg-emerald-100/60 border-emerald-200/70 text-emerald-900'
+                        }`}
+                    >
+                      <div className="flex items-center gap-2 min-w-0 truncate">
+                        <div className="w-6 h-6 rounded-lg bg-emerald-200/80 flex items-center justify-center text-emerald-700 shrink-0">
+                          <Timer size={14} />
+                        </div>
+                        <div className="text-left min-w-0 truncate">
+                          <p className="text-[12px] font-bold uppercase tracking-wider text-emerald-600">Duration</p>
+                          <p className="text-[14px] font-extrabold truncate">
+                            {durationFilter === 'all' ? 'All Durations' : durationFilter === 'under2Weeks' ? '< 2 Weeks' : durationFilter === '2to4Weeks' ? '2–4 Weeks' : durationFilter === '1to3Months' ? '1–3 Months' : durationFilter === '3PlusMonths' ? '3+ Months' : 'Self-Paced'}
+                          </p>
+                        </div>
+                      </div>
+                      <ChevronDown
+                        size={15}
+                        className={`text-emerald-600 shrink-0 transition-transform duration-200 ${openDropdown === 'duration' ? 'rotate-180' : ''}`}
+                      />
+                    </button>
+
+                    {/* Duration Popover Menu */}
+                    {openDropdown === 'duration' && (
+                      <div className="absolute left-0 top-full mt-2 w-64 max-w-[85vw] bg-white backdrop-blur-2xl p-2 rounded-2xl border border-emerald-100 shadow-2xl shadow-emerald-500/20 z-50 animate-in fade-in zoom-in-95 duration-150">
+                        <div className="px-2 py-1.5 text-[12px] font-bold text-emerald-600 uppercase tracking-wider">Estimated Time</div>
+                        {[
+                          { value: 'all', label: 'All Durations', icon: Clock },
+                          { value: 'under2Weeks', label: '< 2 Weeks (Crash)', icon: Timer },
+                          { value: '2to4Weeks', label: '2–4 Weeks (Standard)', icon: Timer },
+                          { value: '1to3Months', label: '1–3 Months (Deep Dive)', icon: Timer },
+                          { value: '3PlusMonths', label: '3+ Months (Specialization)', icon: Timer },
+                          { value: 'selfPaced', label: 'Self-Paced & Books', icon: BookOpen }
+                        ].map(opt => {
+                          const Icon = opt.icon;
+                          const isSelected = durationFilter === opt.value;
+                          return (
+                            <button
+                              key={opt.value}
+                              type="button"
+                              onClick={() => { setDurationFilter(opt.value); setOpenDropdown(null); }}
+                              className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-[14px] font-bold transition-all mt-1 ${isSelected
+                                ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-500/30'
+                                : 'text-emerald-950 hover:bg-emerald-50'
+                                }`}
+                            >
+                              <div className="flex items-center gap-2">
+                                <Icon size={14} className={isSelected ? 'text-white' : 'text-emerald-600'} />
+                                <span>{opt.label}</span>
+                              </div>
+                              {isSelected && <Check size={14} className="stroke-[3]" />}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+
                 </div>
 
-                {/* Duration Dropdown */}
-                <div className="relative col-span-1 sm:flex-1 min-w-0" data-dropdown>
-                  <button
-                    type="button"
-                    onClick={() => setOpenDropdown(openDropdown === 'duration' ? null : 'duration')}
-                    className={`w-full flex items-center justify-between gap-1.5 px-3 py-2.5 sm:px-3.5 sm:py-2.5 rounded-2xl border transition-all duration-200 ${openDropdown === 'duration' || durationFilter !== 'all'
-                      ? 'bg-emerald-100/90 border-emerald-300 text-emerald-950 shadow-md shadow-emerald-500/10'
-                      : 'bg-emerald-50/70 hover:bg-emerald-100/60 border-emerald-200/70 text-emerald-900'
-                      }`}
-                  >
-                    <div className="flex items-center gap-1.5 min-w-0 truncate">
-                      <div className="w-6 h-6 rounded-lg bg-emerald-200/80 flex items-center justify-center text-emerald-700 shrink-0">
-                        <Timer size={14} />
-                      </div>
-                      <div className="text-left min-w-0 truncate">
-                        <p className="text-[11px] sm:text-[13px] font-bold uppercase tracking-wider text-emerald-600">Duration</p>
-                        <p className="text-[12px] sm:text-[13px] font-extrabold truncate">
-                          {durationFilter === 'all' ? 'All Durations' : durationFilter === 'under2Weeks' ? '< 2 Weeks' : durationFilter === '2to4Weeks' ? '2–4 Weeks' : durationFilter === '1to3Months' ? '1–3 Months' : durationFilter === '3PlusMonths' ? '3+ Months' : 'Self-Paced'}
-                        </p>
-                      </div>
-                    </div>
-                    <ChevronDown
-                      size={14}
-                      className={`text-emerald-600 shrink-0 transition-transform duration-200 ${openDropdown === 'duration' ? 'rotate-180' : ''}`}
-                    />
-                  </button>
+                {/* Bottom Row: 2 Dropdowns (Language, Sort By) */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 w-full items-stretch">
 
-                  {/* Duration Popover Menu */}
-                  {openDropdown === 'duration' && (
-                    <div className="absolute left-0 top-full mt-2 w-64 max-w-[85vw] bg-white backdrop-blur-2xl p-2 rounded-2xl border border-emerald-100 shadow-2xl shadow-emerald-500/20 z-50 animate-in fade-in zoom-in-95 duration-150">
-                      <div className="px-2 py-1.5 text-[13px] font-bold text-emerald-600 uppercase tracking-wider">Estimated Time</div>
-                      {[
-                        { value: 'all', label: 'All Durations', icon: Clock },
-                        { value: 'under2Weeks', label: '< 2 Weeks (Crash)', icon: Timer },
-                        { value: '2to4Weeks', label: '2–4 Weeks (Standard)', icon: Timer },
-                        { value: '1to3Months', label: '1–3 Months (Deep Dive)', icon: Timer },
-                        { value: '3PlusMonths', label: '3+ Months (Specialization)', icon: Timer },
-                        { value: 'selfPaced', label: 'Self-Paced & Books', icon: BookOpen }
-                      ].map(opt => {
-                        const Icon = opt.icon;
-                        const isSelected = durationFilter === opt.value;
-                        return (
-                          <button
-                            key={opt.value}
-                            type="button"
-                            onClick={() => { setDurationFilter(opt.value); setOpenDropdown(null); }}
-                            className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-[13px] font-bold transition-all mt-1 ${isSelected
-                              ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-500/30'
-                              : 'text-emerald-950 hover:bg-emerald-50'
-                              }`}
-                          >
-                            <div className="flex items-center gap-2">
-                              <Icon size={14} className={isSelected ? 'text-white' : 'text-emerald-600'} />
-                              <span>{opt.label}</span>
-                            </div>
-                            {isSelected && <Check size={14} className="stroke-[3]" />}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
+                  {/* Language Dropdown */}
+                  <div className="relative w-full" data-dropdown>
+                    <button
+                      type="button"
+                      onClick={() => setOpenDropdown(openDropdown === 'language' ? null : 'language')}
+                      className={`w-full h-full flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-2xl border transition-all duration-200 ${openDropdown === 'language' || (languageFilter && languageFilter !== 'all')
+                        ? 'bg-rose-100/90 border-rose-300 text-rose-950 shadow-md shadow-rose-500/10'
+                        : 'bg-rose-50/70 hover:bg-rose-100/60 border-rose-200/70 text-rose-900'
+                        }`}
+                    >
+                      <div className="flex items-center gap-2 min-w-0 truncate">
+                        <div className="w-6 h-6 rounded-lg bg-rose-200/80 flex items-center justify-center text-rose-700 shrink-0">
+                          <Languages size={14} />
+                        </div>
+                        <div className="text-left min-w-0 truncate">
+                          <p className="text-[12px] font-bold uppercase tracking-wider text-rose-600">Language</p>
+                          <p className="text-[14px] font-extrabold truncate">
+                            {languageFilter === 'all' || !languageFilter ? 'All Languages' : languageFilter === 'english' ? 'English' : languageFilter === 'hindi' ? 'Hindi' : 'Other'}
+                          </p>
+                        </div>
+                      </div>
+                      <ChevronDown
+                        size={15}
+                        className={`text-rose-600 shrink-0 transition-transform duration-200 ${openDropdown === 'language' ? 'rotate-180' : ''}`}
+                      />
+                    </button>
+
+                    {/* Language Popover Menu */}
+                    {openDropdown === 'language' && (
+                      <div className="absolute left-0 top-full mt-2 w-52 max-w-[85vw] bg-white backdrop-blur-2xl p-2 rounded-2xl border border-rose-100 shadow-2xl shadow-rose-500/20 z-50 animate-in fade-in zoom-in-95 duration-150">
+                        <div className="px-2 py-1.5 text-[12px] font-bold text-rose-600 uppercase tracking-wider">Select Language</div>
+                        {[
+                          { value: 'all', label: 'All Languages', icon: Globe2 },
+                          { value: 'english', label: 'English', icon: Languages },
+                          { value: 'hindi', label: 'Hindi', icon: Languages },
+                          { value: 'other', label: 'Other', icon: Sparkles }
+                        ].map(opt => {
+                          const Icon = opt.icon;
+                          const isSelected = (languageFilter || 'all') === opt.value;
+                          return (
+                            <button
+                              key={opt.value}
+                              type="button"
+                              onClick={() => { setLanguageFilter?.(opt.value); setOpenDropdown(null); }}
+                              className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-[14px] font-bold transition-all mt-1 ${isSelected
+                                ? 'bg-rose-500 text-white shadow-sm shadow-rose-500/30'
+                                : 'text-rose-950 hover:bg-rose-50'
+                                }`}
+                            >
+                              <div className="flex items-center gap-2">
+                                <Icon size={14} className={isSelected ? 'text-white' : 'text-rose-500'} />
+                                <span>{opt.label}</span>
+                              </div>
+                              {isSelected && <Check size={14} className="stroke-[3]" />}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Sort Dropdown */}
+                  <div className="relative w-full" data-dropdown>
+                    <button
+                      type="button"
+                      onClick={() => setOpenDropdown(openDropdown === 'sort' ? null : 'sort')}
+                      className={`w-full h-full flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-2xl border transition-all duration-200 ${openDropdown === 'sort'
+                        ? 'bg-amber-100/90 border-amber-300 text-amber-950 shadow-md shadow-amber-500/10'
+                        : 'bg-amber-50/70 hover:bg-amber-100/60 border-amber-200/70 text-amber-900'
+                        }`}
+                    >
+                      <div className="flex items-center gap-2 min-w-0 truncate">
+                        <div className="w-6 h-6 rounded-lg bg-amber-200/80 flex items-center justify-center text-amber-700 shrink-0">
+                          <Sparkles size={14} />
+                        </div>
+                        <div className="text-left min-w-0 truncate">
+                          <p className="text-[12px] font-bold uppercase tracking-wider text-amber-600">Sort By</p>
+                          <p className="text-[14px] font-extrabold truncate">
+                            {sortBy === 'featured' ? 'Featured First' : sortBy === 'popular' ? 'Most Popular' : sortBy === 'rating' ? 'Highest Rated' : 'Alphabetical'}
+                          </p>
+                        </div>
+                      </div>
+                      <ChevronDown
+                        size={15}
+                        className={`text-amber-600 shrink-0 transition-transform duration-200 ${openDropdown === 'sort' ? 'rotate-180' : ''}`}
+                      />
+                    </button>
+
+                    {/* Sort Popover Menu */}
+                    {openDropdown === 'sort' && (
+                      <div className="absolute right-0 sm:left-0 top-full mt-2 w-52 max-w-[85vw] bg-white backdrop-blur-2xl p-2 rounded-2xl border border-amber-100 shadow-2xl shadow-amber-500/20 z-50 animate-in fade-in zoom-in-95 duration-150">
+                        <div className="px-2 py-1.5 text-[12px] font-bold text-amber-600 uppercase tracking-wider">Sort Order</div>
+                        {[
+                          { value: 'featured', label: 'Featured First', icon: Sparkles },
+                          { value: 'popular', label: 'Most Popular', icon: Flame },
+                          { value: 'rating', label: 'Highest Rated', icon: Star },
+                          { value: 'titleAsc', label: 'Alphabetical (A–Z)', icon: ArrowDownAZ }
+                        ].map(opt => {
+                          const Icon = opt.icon;
+                          const isSelected = sortBy === opt.value;
+                          return (
+                            <button
+                              key={opt.value}
+                              type="button"
+                              onClick={() => { setSortBy(opt.value); setOpenDropdown(null); }}
+                              className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-[14px] font-bold transition-all mt-1 ${isSelected
+                                ? 'bg-amber-500 text-white shadow-sm shadow-amber-500/30'
+                                : 'text-amber-950 hover:bg-amber-50'
+                                }`}
+                            >
+                              <div className="flex items-center gap-2">
+                                <Icon size={14} className={isSelected ? 'text-white' : 'text-amber-600'} />
+                                <span>{opt.label}</span>
+                              </div>
+                              {isSelected && <Check size={14} className="stroke-[3]" />}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
                 </div>
-
-                {/* Language Dropdown */}
-                <div className="relative col-span-1 sm:flex-1 min-w-0" data-dropdown>
-                  <button
-                    type="button"
-                    onClick={() => setOpenDropdown(openDropdown === 'language' ? null : 'language')}
-                    className={`w-full flex items-center justify-between gap-1.5 px-3 py-2.5 sm:px-3.5 sm:py-2.5 rounded-2xl border transition-all duration-200 ${openDropdown === 'language' || (languageFilter && languageFilter !== 'all')
-                      ? 'bg-rose-100/90 border-rose-300 text-rose-950 shadow-md shadow-rose-500/10'
-                      : 'bg-rose-50/70 hover:bg-rose-100/60 border-rose-200/70 text-rose-900'
-                      }`}
-                  >
-                    <div className="flex items-center gap-1.5 min-w-0 truncate">
-                      <div className="w-6 h-6 rounded-lg bg-rose-200/80 flex items-center justify-center text-rose-700 shrink-0">
-                        <Languages size={14} />
-                      </div>
-                      <div className="text-left min-w-0 truncate">
-                        <p className="text-[11px] sm:text-[13px] font-bold uppercase tracking-wider text-rose-600">Language</p>
-                        <p className="text-[12px] sm:text-[13px] font-extrabold truncate">
-                          {languageFilter === 'all' || !languageFilter ? 'All Languages' : languageFilter === 'english' ? 'English' : languageFilter === 'hindi' ? 'Hindi' : 'Other'}
-                        </p>
-                      </div>
-                    </div>
-                    <ChevronDown
-                      size={14}
-                      className={`text-rose-600 shrink-0 transition-transform duration-200 ${openDropdown === 'language' ? 'rotate-180' : ''}`}
-                    />
-                  </button>
-
-                  {/* Language Popover Menu */}
-                  {openDropdown === 'language' && (
-                    <div className="absolute right-0 sm:left-0 top-full mt-2 w-52 max-w-[85vw] bg-white backdrop-blur-2xl p-2 rounded-2xl border border-rose-100 shadow-2xl shadow-rose-500/20 z-50 animate-in fade-in zoom-in-95 duration-150">
-                      <div className="px-2 py-1.5 text-[13px] font-bold text-rose-600 uppercase tracking-wider">Select Language</div>
-                      {[
-                        { value: 'all', label: 'All Languages', icon: Globe2 },
-                        { value: 'english', label: 'English', icon: Languages },
-                        { value: 'hindi', label: 'Hindi', icon: Languages },
-                        { value: 'other', label: 'Other', icon: Sparkles }
-                      ].map(opt => {
-                        const Icon = opt.icon;
-                        const isSelected = (languageFilter || 'all') === opt.value;
-                        return (
-                          <button
-                            key={opt.value}
-                            type="button"
-                            onClick={() => { setLanguageFilter?.(opt.value); setOpenDropdown(null); }}
-                            className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-[13px] font-bold transition-all mt-1 ${isSelected
-                              ? 'bg-rose-500 text-white shadow-sm shadow-rose-500/30'
-                              : 'text-rose-950 hover:bg-rose-50'
-                              }`}
-                          >
-                            <div className="flex items-center gap-2">
-                              <Icon size={14} className={isSelected ? 'text-white' : 'text-rose-500'} />
-                              <span>{opt.label}</span>
-                            </div>
-                            {isSelected && <Check size={14} className="stroke-[3]" />}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-
-                {/* Sort Dropdown */}
-                <div className="relative col-span-2 sm:col-span-1 sm:flex-1 min-w-0" data-dropdown>
-                  <button
-                    type="button"
-                    onClick={() => setOpenDropdown(openDropdown === 'sort' ? null : 'sort')}
-                    className={`w-full flex items-center justify-between gap-1.5 px-3 py-2.5 sm:px-3.5 sm:py-2.5 rounded-2xl border transition-all duration-200 ${openDropdown === 'sort'
-                      ? 'bg-amber-100/90 border-amber-300 text-amber-950 shadow-md shadow-amber-500/10'
-                      : 'bg-amber-50/70 hover:bg-amber-100/60 border-amber-200/70 text-amber-900'
-                      }`}
-                  >
-                    <div className="flex items-center gap-1.5 min-w-0 truncate">
-                      <div className="w-6 h-6 rounded-lg bg-amber-200/80 flex items-center justify-center text-amber-700 shrink-0">
-                        <Sparkles size={14} />
-                      </div>
-                      <div className="text-left min-w-0 truncate">
-                        <p className="text-[11px] sm:text-[13px] font-bold uppercase tracking-wider text-amber-600">Sort By</p>
-                        <p className="text-[12px] sm:text-[13px] font-extrabold truncate">
-                          {sortBy === 'featured' ? 'Featured First' : sortBy === 'popular' ? 'Most Popular' : sortBy === 'rating' ? 'Highest Rated' : 'Alphabetical'}
-                        </p>
-                      </div>
-                    </div>
-                    <ChevronDown
-                      size={14}
-                      className={`text-amber-600 shrink-0 transition-transform duration-200 ${openDropdown === 'sort' ? 'rotate-180' : ''}`}
-                    />
-                  </button>
-
-                  {/* Sort Popover Menu */}
-                  {openDropdown === 'sort' && (
-                    <div className="absolute left-0 top-full mt-2 w-52 max-w-[85vw] bg-white backdrop-blur-2xl p-2 rounded-2xl border border-amber-100 shadow-2xl shadow-amber-500/20 z-50 animate-in fade-in zoom-in-95 duration-150">
-                      <div className="px-2 py-1.5 text-[13px] font-bold text-amber-600 uppercase tracking-wider">Sort Order</div>
-                      {[
-                        { value: 'featured', label: 'Featured First', icon: Sparkles },
-                        { value: 'popular', label: 'Most Popular', icon: Flame },
-                        { value: 'rating', label: 'Highest Rated', icon: Star },
-                        { value: 'titleAsc', label: 'Alphabetical (A–Z)', icon: ArrowDownAZ }
-                      ].map(opt => {
-                        const Icon = opt.icon;
-                        const isSelected = sortBy === opt.value;
-                        return (
-                          <button
-                            key={opt.value}
-                            type="button"
-                            onClick={() => { setSortBy(opt.value); setOpenDropdown(null); }}
-                            className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-[13px] font-bold transition-all mt-1 ${isSelected
-                              ? 'bg-amber-500 text-white shadow-sm shadow-amber-500/30'
-                              : 'text-amber-950 hover:bg-amber-50'
-                              }`}
-                          >
-                            <div className="flex items-center gap-2">
-                              <Icon size={14} className={isSelected ? 'text-white' : 'text-amber-600'} />
-                              <span>{opt.label}</span>
-                            </div>
-                            {isSelected && <Check size={14} className="stroke-[3]" />}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-
               </div>
-
             </div>
 
             {/* Right: Pricing Box */}
@@ -1420,7 +1434,7 @@ const AppContent = () => {
             className="bg-white rounded-3xl max-w-5xl w-full p-6 shadow-2xl border border-pink-100 my-8"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Modal Header - Violet Theme */}
+            {/* Modal Header */}
             <div className="flex items-center justify-between pb-4 border-b border-violet-100 mb-6">
               <div>
                 <h3 className="text-xl font-extrabold text-slate-900 flex items-center gap-2">
